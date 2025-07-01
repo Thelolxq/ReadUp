@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/screens/sign_in_screen.dart';
 import 'package:read_up/widgets/elevated_button_perso.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -14,27 +15,37 @@ class WelcomeScreen extends StatelessWidget {
             'assets/images/fondo.jpeg',
             fit: BoxFit.cover,
           ),
-          const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Text(
-                  "BIENVENIDO DE VUELTA",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
-                ),
-              ),
-              SizedBox(height: 10),
-              Center(
-                child: Text("¿Que desea realizar?", style: TextStyle(fontSize: 15),),
-              ),
-            ],
-          ),
           const Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(30, 180, 40, 0),
+              child: Text(
+                "Sumergete en tu proxima gran historia",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 38,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+          ),
+          Align(
+            alignment: const Alignment(0, 0.4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(child: ElevatedButtonPerso(text: "Iniciar sesion", shape: ButtonShape.rigth)),
-                Expanded(child: ElevatedButtonPerso(text: "Registrarse", shape: ButtonShape.left))
+                ElevatedButtonPerso(
+                  text: "Inciar sesion",
+                  
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SignInScreen()));
+                  },
+                ),
+               const SizedBox(height: 10),
+                ElevatedButtonPerso(text: "Crear una cuenta", color: Colors.transparent, fontSize: 15, fontWeight: FontWeight.w400, overlay: Colors.transparent,)
               ],
             ),
           )
