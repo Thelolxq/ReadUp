@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/screens/register_screen.dart';
 import 'package:read_up/screens/sign_in_screen.dart';
 import 'package:read_up/widgets/elevated_button_perso.dart';
 
@@ -36,16 +37,21 @@ class WelcomeScreen extends StatelessWidget {
               children: [
                 ElevatedButtonPerso(
                   text: "Inciar sesion",
-                  
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SignInScreen()));
+                    Navigator.pushNamed(context, '/signIn');
                   },
                 ),
-               const SizedBox(height: 10),
-                ElevatedButtonPerso(text: "Crear una cuenta", color: Colors.transparent, fontSize: 15, fontWeight: FontWeight.w400, overlay: Colors.transparent,)
+                const SizedBox(height: 10),
+                ElevatedButtonPerso(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/register');
+                  },
+                  text: "Crear una cuenta",
+                  color: Colors.transparent,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  overlay: Colors.transparent,
+                )
               ],
             ),
           )

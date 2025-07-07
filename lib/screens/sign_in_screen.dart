@@ -1,111 +1,154 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/screens/encuesta_screen.dart';
+import 'package:read_up/screens/register_screen.dart';
+import 'package:read_up/widgets/curved_container.dart';
+import 'package:read_up/widgets/elevated_button_sign.dart';
+import 'package:read_up/widgets/texfieldform_perso.dart';
 
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
-
-  @override
-  State<SignInScreen> createState() => _SignInScreenState();
-}
-
-class _SignInScreenState extends State<SignInScreen> {
-  bool _isPasswordVisible = false;
-
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color.fromARGB(255, 41, 53, 92);
-
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            toolbarHeight: 100,
+            elevation: 0,
+            foregroundColor: Colors.black,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(
+                  Icons.arrow_back_ios_new,
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  size: 20,
+                ))),
+        backgroundColor: Colors.white,
+        body: Stack(children: [
+          SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Bienvenido de vuelta',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                ClipPath(
+                  clipper: CurvedContainer(),
+                  child: Container(
+                      height: size.height / 2.3,
+                      width: size.width,
+                      child: Image.asset(
+                        "assets/images/fondo2.jpg",
+                        fit: BoxFit.cover,
+                      )),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Inicia sesión para continuar',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[500],
+                Container(
+                  width: size.width * 1,
+                  height: size.height / 1.832,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
                   ),
-                ),
-                const SizedBox(height: 50),
-                TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    fillColor: Color.fromARGB(31, 41, 53, 92),
-                    border: InputBorder.none,
-                    filled: true,
-                    labelText: "Correo electrónico",
-                    labelStyle: TextStyle(
-                        color: primaryColor, fontWeight: FontWeight.w600),
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  obscureText: !_isPasswordVisible,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    fillColor: const Color.fromARGB(31, 41, 53, 92),
-                    filled: true,
-                    labelText: "***********",
-                    labelStyle: const TextStyle(
-                        color: primaryColor, fontWeight: FontWeight.w600),
-                    prefixIcon: const Icon(
-                      Icons.lock_outline,
-                      color: primaryColor,
-                    ),
-                    suffixIcon: IconButton(
-                      color: primaryColor,
-                      icon: Icon(
-                        _isPasswordVisible
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
+                  child: Column(
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                            "Bienvenido de vuelta",
+                            style: TextStyle(
+                                fontSize: 35,
+                                fontWeight: FontWeight.w500,
+                                color: Color.fromARGB(255, 27, 63, 154)),
+                          ),
+                          Text(
+                            "inicia sesion con tu cuenta",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                                fontSize: 15),
+                          )
+                        ],
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
+                      Form(
+                          child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 25, vertical: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const TexfieldformPerso(
+                              hinText: "Email",
+                              icon: Icons.email_rounded,
+                            ),
+                            const SizedBox(height: 20),
+                            const TexfieldformPerso(
+                              hinText: "Password",
+                              icon: Icons.password_rounded,
+                            ),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                //hacer remember me
+                                InkWell(
+                                  child: Text(
+                                    "¿Olvidaste tu contraseña?",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 120),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: size.width * 1,
+                                  height: 60,
+                                  child: ElevatedButtonSign(
+                                    text: "Iniciar sesion",
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/quiz');
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "¿No tienes una cuenta?",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                    SizedBox(width: 10),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pushNamed(context, '/register');
+                                      },
+                                      child: Text(
+                                        "Registrate aqui",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Color.fromARGB(
+                                                255, 27, 63, 154)),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ))
+                    ],
                   ),
-                ),
-                ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                    child: Text("Iniciar Sesion"))
+                )
               ],
             ),
           ),
-        ),
-      ),
-    );
+        ]));
   }
 }

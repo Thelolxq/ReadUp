@@ -40,13 +40,8 @@ class ElevatedButtonPerso extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-        onPressed: onPressed ??
-            () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const WelcomeScreen()));
-            },
+        onPressed: onPressed,
+           
         style: ButtonStyle(
           padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 10, horizontal: 120)),
           backgroundColor: WidgetStateProperty.all(color?? const Color.fromARGB(55, 158, 158, 158)),

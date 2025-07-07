@@ -1,0 +1,25 @@
+      SizedBox(
+                width: size.width * 1,
+                height: size.height / 6,
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        "Bienvenido de vuelta",
+                        style: TextStyle(
+                            fontSize: 40, fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        "inicie sesion para continuar",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
