@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:read_up/screens/encuesta_screen.dart';
-import 'package:read_up/screens/register_screen.dart';
+import 'package:read_up/screens/quiz/encuesta_screen.dart';
+import 'package:read_up/screens/singIn/register_screen.dart';
 import 'package:read_up/widgets/curved_container.dart';
 import 'package:read_up/widgets/elevated_button_sign.dart';
 import 'package:read_up/widgets/texfieldform_perso.dart';
@@ -110,7 +110,7 @@ class SignInScreen extends StatelessWidget {
                                   child: ElevatedButtonSign(
                                     text: "Iniciar sesion",
                                     onPressed: () {
-                                      Navigator.pushNamed(context, '/quiz');
+                                      Navigator.pushNamed(context, '/home');
                                     },
                                   ),
                                 ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/screens/quiz/nivel_encuesta_screen.dart';
+import 'package:read_up/widgets/button_quiz.dart';
 
 class GeneroScreen extends StatefulWidget {
   const GeneroScreen({super.key});
@@ -46,8 +48,17 @@ class _GeneroScreenState extends State<GeneroScreen> {
               children: [
                 const Text(
                   "¿Qué géneros te gustan más?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Color.fromARGB(255, 27, 63, 154)),
                   textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10,),
+                 Text(
+                  "No hay respuestas incorrectas, solo elige lo que más te guste",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromARGB(255, 0, 0, 0)),
                 ),
                 const SizedBox(height: 20),
                 Expanded(
@@ -56,12 +67,17 @@ class _GeneroScreenState extends State<GeneroScreen> {
                       spacing: 20,
                       runSpacing: 40,
                       children: _generos.map((genero) {
-                        final isSelected = _generosSeleccionados.contains(genero);
+                        final isSelected =
+                            _generosSeleccionados.contains(genero);
                         return ChoiceChip(
                           label: Text(genero),
                           selected: isSelected,
                           selectedColor: const Color.fromARGB(255, 27, 63, 154),
+                          checkmarkColor: Colors.green,
                           backgroundColor: Colors.grey.shade200,
+                          elevation: 2,
+                          shadowColor: Colors.black,
+                          side: BorderSide(color: Colors.transparent),
                           labelStyle: TextStyle(
                             color: isSelected ? Colors.white : Colors.black,
                           ),
@@ -85,26 +101,10 @@ class _GeneroScreenState extends State<GeneroScreen> {
           Container(
             width: size.width,
             height: 70,
-            child: ElevatedButton(
-              onPressed: _generosSeleccionados.isEmpty ? null : () {
-                // Aquí puedes guardar o enviar los géneros seleccionados
-                print("Géneros seleccionados: $_generosSeleccionados");
-              },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                  (states) => _generosSeleccionados.isEmpty
-                      ? Colors.grey
-                      : const Color.fromARGB(255, 27, 63, 154),
-                ),
-                foregroundColor: WidgetStateProperty.all(Colors.white),
-                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-              ),
-              child: const Text("Continuar"),
-            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ButtonQuiz(screen: NivelLectorScreen(), isEnable: _generosSeleccionados.isNotEmpty,),
+            )
           ),
         ],
       ),

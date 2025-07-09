@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:read_up/screens/sign_in_screen.dart';
+import 'package:read_up/screens/singIn/sign_in_screen.dart';
 
 class ElevatedButtonSign extends StatelessWidget {
   final String text;

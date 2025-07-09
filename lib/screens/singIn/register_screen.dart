@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:read_up/screens/sign_in_screen.dart';
+import 'package:read_up/screens/singIn/sign_in_screen.dart';
 import 'package:read_up/widgets/elevated_button_sign.dart';
 import 'package:read_up/widgets/texfieldform_perso.dart';
 
@@ -81,7 +81,7 @@ class RegisterScreen extends StatelessWidget {
                                 height: 60,
                                 child: ElevatedButtonSign(
                                   text: "Registrate",
-                                  onPressed: () {Navigator.pushNamed(context, '/signIn');},
+                                  onPressed: () {Navigator.pushNamed(context, '/quiz');},
                                 )),
                             SizedBox(height: 100),
                             Row(

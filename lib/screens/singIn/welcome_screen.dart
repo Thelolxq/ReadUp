@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:read_up/screens/register_screen.dart';
-import 'package:read_up/screens/sign_in_screen.dart';
+import 'package:read_up/screens/singIn/register_screen.dart';
+import 'package:read_up/screens/singIn/sign_in_screen.dart';
 import 'package:read_up/widgets/elevated_button_perso.dart';
 
 class WelcomeScreen extends StatelessWidget {
