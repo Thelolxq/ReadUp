@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/navigation/navigation_menu.dart';
 import 'package:read_up/screens/quiz/encuesta_screen.dart';
 import 'package:read_up/screens/singIn/register_screen.dart';
 import 'package:read_up/widgets/curved_container.dart';
@@ -110,7 +111,7 @@ class SignInScreen extends StatelessWidget {
                                   child: ElevatedButtonSign(
                                     text: "Iniciar sesion",
                                     onPressed: () {
-                                      Navigator.pushNamed(context, '/home');
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationMenu()));
                                     },
                                   ),
                                 ),

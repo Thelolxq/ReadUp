@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/navigation/navigation_menu.dart';
 import 'package:read_up/screens/homePages/home_screen.dart';
 import 'package:read_up/widgets/button_quiz.dart';
 
@@ -136,7 +137,7 @@ class _ObjetivosScreenState extends State<ObjetivosScreen> {
               height: 70,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ButtonQuiz(screen: HomeScreen(), isEnable: _puedeContinuar,),
+                child: ButtonQuiz(screen: NavigationMenu(), isEnable: _puedeContinuar,),
               ),
             ),
           ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/screens/homePages/home_screen.dart';
 import 'package:read_up/screens/quiz/edad_encuesta_screen.dart';
 import 'package:read_up/screens/quiz/encuesta_screen.dart';
 import 'package:read_up/screens/quiz/genero_encuesta_screen.dart';
-import 'package:read_up/screens/homePages/home_screen.dart';
 import 'package:read_up/screens/quiz/nivel_encuesta_screen.dart';
 import 'package:read_up/screens/quiz/objetivos_screen.dart';
 import 'package:read_up/screens/singIn/register_screen.dart';
