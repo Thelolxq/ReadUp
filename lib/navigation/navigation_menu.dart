@@ -40,8 +40,13 @@ class _NavigationMenuState extends State<NavigationMenu> {
     return Scaffold(
       bottomNavigationBar: Obx(
         () => NavigationBar(
+          overlayColor: WidgetStatePropertyAll(Colors.transparent),
+          surfaceTintColor: Colors.transparent,
+          indicatorColor: Colors.blue[800],
           height: 80,
-          elevation: 0,
+          elevation: 30,
+          animationDuration: Duration(seconds: 1),
+          shadowColor: Colors.black,
           backgroundColor: Colors.white,
           selectedIndex: controller.selectedIndex.value,
           onDestinationSelected: (index) => controller.selectedIndex.value = index,
