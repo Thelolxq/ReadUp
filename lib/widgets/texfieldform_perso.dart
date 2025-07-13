@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
 
-
 class TexfieldformPerso extends StatelessWidget {
   final String hinText;
   final IconData icon;
-  const TexfieldformPerso({
-    super.key, 
-    required this.hinText,
-    required this.icon
-  });
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  const TexfieldformPerso(
+      {super.key,
+      required this.hinText,
+      required this.icon,
+      this.controller,
+      this.validator});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      
+      controller: controller,
+      validator: validator,
       decoration: InputDecoration(
         prefixIcon: Icon(icon),
         filled: true,
-        hintText: hinText ,
-        hintStyle: TextStyle(color: Color.fromARGB(255, 27, 63, 154), fontWeight: FontWeight.w500),
+        hintText: hinText,
+        hintStyle: TextStyle(
+            color: Color.fromARGB(255, 27, 63, 154),
+            fontWeight: FontWeight.w500),
         fillColor: const Color.fromARGB(168, 163, 207, 255),
         disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none
-            
-            ),
+            borderSide: BorderSide.none),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none
-            ),
+            borderSide: BorderSide.none),
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none
-            ),
+            borderSide: BorderSide.none),
       ),
     );
   }

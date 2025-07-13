@@ -78,6 +78,7 @@ class SignInScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             const TexfieldformPerso(
+                             
                               hinText: "Email",
                               icon: Icons.email_rounded,
                             ),
