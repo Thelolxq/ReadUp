@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:read_up/config/app_config.dart';
 import 'package:read_up/models/user.dart';
 import 'package:read_up/navigation/navigation_controller.dart';
 import 'package:read_up/navigation/navigation_menu.dart';
@@ -24,23 +25,10 @@ class _SignInScreenState extends State<SignInScreen> {
   final _correoController = TextEditingController();
   final _contrasenaController = TextEditingController();
 
-  void _goToNextScreen() async {
-    final authService = AuthService();
-    final profileService = ProfileService();
-    final email = _correoController.text.trim();
-    final contrasena = _contrasenaController.text.trim();
+  bool _isLoading = false;
 
-    try {
-      print("intentado loguear al usuario");
-      print("$email, $contrasena");
-      String token = await authService.login(email, contrasena);
-      print(token);
-      User usuarioLogueado = await profileService.getProfileWithToken(token);
-
-      if (mounted) {
-        context.read<SessionProvider>().setUser(usuarioLogueado);
-
-        Navigator.pushAndRemoveUntil(
+  void _navigateHome(){
+   Navigator.pushAndRemoveUntil(
             context,
             PageRouteBuilder(
               transitionDuration: Duration(milliseconds: 500),
@@ -66,6 +54,49 @@ class _SignInScreenState extends State<SignInScreen> {
               },
             ),
             (Route<dynamic> route) => false);
+  }
+
+
+  void _goToNextScreen() async {
+
+    if(kDeveloperMode){
+      print("Modo desarrollador activado: saltando login");
+    final fakeuser = User(
+      correo: "dev@gmail.com",
+    );
+
+
+    context.read<SessionProvider>().setUser(fakeuser);
+
+    _navigateHome();
+
+    return;
+
+
+    }
+
+  if(!_keyForm.currentState!.validate()) return;
+
+
+    final authService = AuthService();
+    final profileService = ProfileService();
+    final email = _correoController.text.trim();
+    final contrasena = _contrasenaController.text.trim();
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      print("intentado loguear al usuario");
+      print("$email, $contrasena");
+      String token = await authService.login(email, contrasena);
+      print(token);
+      User usuarioLogueado = await profileService.getProfileWithToken(token);
+
+      if (mounted) {
+        context.read<SessionProvider>().setUser(usuarioLogueado);
+        _navigateHome();
       }
     } catch (e) {
       print('Ocurrio un error al enviar los datos $e');
@@ -74,6 +105,10 @@ class _SignInScreenState extends State<SignInScreen> {
             content: Text(
           "Error al registrar, intentalo de nuevo",
         )));
+
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -143,25 +178,37 @@ class _SignInScreenState extends State<SignInScreen> {
                       Form(
                           key: _keyForm,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 25),
+                            padding: const EdgeInsets.symmetric(horizontal: 25),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 TexfieldformPerso(
+                                  validator: (value){
+                                    if(value == null || value.isEmpty){
+                                      return 'Por favor, ingresa un correo';
+                                    }
+                                    return null;
+                                  },
                                   controller: _correoController,
                                   hinText: "Email",
                                   icon: Icons.email_rounded,
                                 ),
                                 const SizedBox(height: 20),
                                 TexfieldformPerso(
+                                   validator: (value){
+                                    if(value == null || value.isEmpty){
+                                      return 'Por favor, ingresa una contraseña';
+                                    }
+                                    return null;
+                                  },
                                   controller: _contrasenaController,
                                   hinText: "Password",
                                   icon: Icons.password_rounded,
                                 ),
                                 SizedBox(height: 20),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     //hacer remember me
                                     InkWell(
@@ -172,10 +219,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                             fontSize: 13),
                                       ),
                                     ),
-                                    ElevatedButton(onPressed: (){
-                                      Navigator.pushNamed(context, '/home');
-                                    }, 
-                                    child: Text("prueba"))
                                   ],
                                 ),
                                 const SizedBox(height: 120),
@@ -186,6 +229,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                       width: size.width * 1,
                                       height: 60,
                                       child: ElevatedButtonSign(
+                                        isLoading: _isLoading,
                                         text: "Iniciar sesion",
                                         onPressed: _goToNextScreen,
                                       ),

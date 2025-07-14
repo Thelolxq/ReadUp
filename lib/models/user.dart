@@ -1,32 +1,32 @@
 import 'dart:convert';
 
 class User {
-  final String id;
-  final String nombreDeUsuario;
-  final String correo;
+  final String? id;
+  final String? nombreDeUsuario;
+  final String? correo;
 
-  final int edad;
-  final String generoSexual;
+  final int? edad;
+  final String? generoSexual;
 
-  final List<String> generosFavoritos;
-  final String nivelLector;
-  final String objetivoLector;
-  final int paginasDiarias;
-  final String objetivoSemanal;
+  final List<String>? generosFavoritos;
+  final String? nivelLector;
+  final String? objetivoLector;
+  final int? paginasDiarias;
+  final String? objetivoSemanal;
 
   final String? token;
 
   User({
-    required this.id,
-    required this.nombreDeUsuario,
-    required this.correo,
-    required this.edad,
-    required this.generoSexual,
-    required this.generosFavoritos,
-    required this.nivelLector,
-    required this.objetivoLector,
-    required this.paginasDiarias,
-    required this.objetivoSemanal,
+    this.id,
+    this.nombreDeUsuario,
+    this.correo,
+    this.edad,
+    this.generoSexual,
+    this.generosFavoritos,
+    this.nivelLector,
+    this.objetivoLector,
+    this.paginasDiarias,
+    this.objetivoSemanal,
     this.token,
   });
 
@@ -52,7 +52,7 @@ class User {
         "correo": correo,
         "edad": edad,
         "generoSexual": generoSexual,
-        "generosFavoritos": List<dynamic>.from(generosFavoritos.map((x) => x)),
+        "generosFavoritos": List<dynamic>.from(generosFavoritos!.map((x) => x)),
         "nivelLector": nivelLector,
         "objetivoLector": objetivoLector,
         "paginasDiarias": paginasDiarias,

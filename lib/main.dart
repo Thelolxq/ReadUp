@@ -41,7 +41,7 @@ class MainApp extends StatelessWidget {
           '/quiz4': (context) => const GeneroScreen(),
           '/quiz5': (context) => const NivelLectorScreen(),
           '/quiz6': (context) => const ObjetivosScreen(),
-          '/home': (context) => const HomeScreen()
+          '/home': (context) => const HomeScreen(),
         },
       ),
     );

@@ -18,6 +18,16 @@ class HomeScreen extends StatelessWidget {
       "assets/libros/libro4.jpg",
       "assets/libros/libro5.jpg",
     ];
+
+    final List<String> generos = [
+      "Terror",
+      "Comedia",
+      "Romance",
+      "Rom-Com",
+      "Historia",
+      "Ciencia Ficcion",
+      "Drama",
+    ];
     final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.blue[800],
@@ -57,18 +67,69 @@ class HomeScreen extends StatelessWidget {
                     )),
               ),
             ),
-            Row(
-              
-              children: [Padding(
-                padding: const EdgeInsets.only(left: 30, top: 50),
-                child: Text("Generos", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+            Padding(
+              padding: const EdgeInsets.only(top: 50, left: 30, right: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Generos",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900),
+                  ),
+                  IconButton(
+                      color: Colors.white,
+                      style: IconButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12))),
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.more_horiz,
+                        size: 30,
+                      ))
+                ],
               ),
-
-                
-              
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Column(
+              children: [
+                CarouselSlider(
+                    options: CarouselOptions(
+                        viewportFraction: .4,
+                        pageSnapping: true,
+                        initialPage: 0,
+                        height: 50,
+                        enlargeCenterPage: false),
+                    items: generos.map((valor) {
+                      return Builder(builder: (BuildContext context) {
+                        return Center(
+                          
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12))),
+                                onPressed: () {},
+                                child: Text(
+                                  valor,
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                )));
+                      });
+                    }).toList()),
               ],
             ),
-            SizedBox(height: 100),
+            SizedBox(
+              height: 100,
+            ),
             ClipPath(
               clipper: CurvedHome(),
               child: Container(
@@ -76,10 +137,9 @@ class HomeScreen extends StatelessWidget {
                 width: size.width,
                 height: size.height,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 50, left: 30),
+                      padding: EdgeInsets.only(top: 50, left: 30, right: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -88,7 +148,7 @@ class HomeScreen extends StatelessWidget {
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
-                                fontWeight: FontWeight.bold),
+                                fontWeight: FontWeight.w900),
                           ),
                           IconButton(
                               style: IconButton.styleFrom(
