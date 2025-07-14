@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:read_up/provider/registration_provider.dart';
 import 'package:read_up/screens/quiz/nivel_encuesta_screen.dart';
 import 'package:read_up/widgets/button_quiz.dart';
 
@@ -10,6 +12,41 @@ class GeneroScreen extends StatefulWidget {
 }
 
 class _GeneroScreenState extends State<GeneroScreen> {
+
+   void _goToNextScreen(){
+    FocusScope.of(context).unfocus();
+
+    final registrationProvider = context.read<RegistrationProvider>();
+
+    registrationProvider.setGenerosFavoritos(_generos);
+    Navigator.push(
+          context,
+          PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 500),
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                NivelLectorScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              final offsetAnimation = Tween<Offset>(
+                begin: Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOut,
+              ));
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
+          ),
+        );
+    
+
+  }
+
+
   final List<String> _generos = [
     'Fantasía',
     'Ciencia ficción',
@@ -103,7 +140,7 @@ class _GeneroScreenState extends State<GeneroScreen> {
             height: 70,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ButtonQuiz(screen: NivelLectorScreen(), isEnable: _generosSeleccionados.isNotEmpty,),
+              child: ButtonQuiz(onPressed: _goToNextScreen , isEnable: _generosSeleccionados.isNotEmpty,),
             )
           ),
         ],

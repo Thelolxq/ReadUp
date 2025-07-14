@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:read_up/provider/registration_provider.dart';
 import 'package:read_up/screens/quiz/genero_encuesta_screen.dart';
 import 'package:read_up/widgets/button_quiz.dart';
 
@@ -10,12 +12,35 @@ class SexoScreen extends StatefulWidget {
 }
 
 class _SexoScreenState extends State<SexoScreen> {
+  void _goToNextScreen() {
+    FocusScope.of(context).unfocus();
+
+    final registrationProvider = context.read<RegistrationProvider>();
+
+    registrationProvider.setGeneroSexual(_sexoSeleccionado!);
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 500),
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                GeneroScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              final offsetAnimation = Tween<Offset>(
+                begin: Offset(0, 1),
+                end: Offset.zero,
+              ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+
+              return SlideTransition(position: offsetAnimation, child: child);
+            }));
+  }
+
   String? _sexoSeleccionado;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-      
 
     Widget buildSexoButton(String sexo) {
       final isSelected = _sexoSeleccionado == sexo;
@@ -89,7 +114,10 @@ class _SexoScreenState extends State<SexoScreen> {
               height: 70,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ButtonQuiz(screen: GeneroScreen(), isEnable: _sexoSeleccionado != null,),
+                child: ButtonQuiz(
+                  onPressed: _goToNextScreen,
+                  isEnable: _sexoSeleccionado != null,
+                ),
               )),
         ],
       ),

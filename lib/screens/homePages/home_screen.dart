@@ -9,18 +9,16 @@ class HomeScreen extends StatelessWidget {
     super.key,
   });
 
-
-
   @override
   Widget build(BuildContext context) {
-        final List<String> bookList = [
-    "assets/libros/libro1.jpg",
-    "assets/libros/libro2.jpg",
-    "assets/libros/libro3.jpg",
-    "assets/libros/libro4.jpg",
-    "assets/libros/libro5.jpg",
-  ];
-  final size = MediaQuery.of(context).size;
+    final List<String> bookList = [
+      "assets/libros/libro1.jpg",
+      "assets/libros/libro2.jpg",
+      "assets/libros/libro3.jpg",
+      "assets/libros/libro4.jpg",
+      "assets/libros/libro5.jpg",
+    ];
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.blue[800],
       body: SingleChildScrollView(
@@ -58,6 +56,17 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.white,
                     )),
               ),
+            ),
+            Row(
+              
+              children: [Padding(
+                padding: const EdgeInsets.only(left: 30, top: 50),
+                child: Text("Generos", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              ),
+
+                
+              
+              ],
             ),
             SizedBox(height: 100),
             ClipPath(

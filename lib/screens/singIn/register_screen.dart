@@ -23,6 +23,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final registrationProvider = context.read<RegistrationProvider>();
 
+    registrationProvider.updateCredentials(_nombreController.text,
+        _correoController.text, _contrasenaController.text);
+
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -47,10 +50,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              
               Padding(
                 padding: const EdgeInsets.all(3.0),
-               
                 child: Text(
                   "Registro",
                   style: TextStyle(
@@ -79,20 +80,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: Column(
                           children: [
                             TexfieldformPerso(
-                              controller: _nombreController,
-                              validator: (value){
-                                if( value == null || value.isEmpty){
-                                  return 'Por favor escribe un nombre de usuario';
-                                }
-                                return null;
-                              },
+                                controller: _nombreController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor escribe un nombre de usuario';
+                                  }
+                                  return null;
+                                },
                                 hinText: "Username",
                                 icon: Icons.person_3_rounded),
                             SizedBox(height: 20),
                             TexfieldformPerso(
                               controller: _correoController,
-                              validator: (value){
-                                if(value ==null || !value.contains('@')){
+                              validator: (value) {
+                                if (value == null || !value.contains('@')) {
                                   return 'por favor, introduce un correo valido';
                                 }
                                 return null;
@@ -103,8 +104,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(height: 20),
                             TexfieldformPerso(
                               controller: _contrasenaController,
-                              validator: (value){
-                                if(value == null || value.length < 6 ){
+                              validator: (value) {
+                                if (value == null || value.length < 6) {
                                   return 'La contraseña debe tener al menos 6 caracteres';
                                 }
                                 return null;

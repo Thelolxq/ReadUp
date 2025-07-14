@@ -1,13 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:read_up/models/user.dart';
+import 'package:read_up/navigation/navigation_controller.dart';
 import 'package:read_up/navigation/navigation_menu.dart';
+import 'package:read_up/provider/session_provider.dart';
 import 'package:read_up/screens/quiz/encuesta_screen.dart';
 import 'package:read_up/screens/singIn/register_screen.dart';
+import 'package:read_up/services/auth_service.dart';
+import 'package:read_up/services/profile_service.dart';
 import 'package:read_up/widgets/curved_container.dart';
 import 'package:read_up/widgets/elevated_button_sign.dart';
 import 'package:read_up/widgets/texfieldform_perso.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final _keyForm = GlobalKey<FormState>();
+  final _correoController = TextEditingController();
+  final _contrasenaController = TextEditingController();
+
+  void _goToNextScreen() async {
+    final authService = AuthService();
+    final profileService = ProfileService();
+    final email = _correoController.text.trim();
+    final contrasena = _contrasenaController.text.trim();
+
+    try {
+      print("intentado loguear al usuario");
+      print("$email, $contrasena");
+      String token = await authService.login(email, contrasena);
+      print(token);
+      User usuarioLogueado = await profileService.getProfileWithToken(token);
+
+      if (mounted) {
+        context.read<SessionProvider>().setUser(usuarioLogueado);
+
+        Navigator.pushAndRemoveUntil(
+            context,
+            PageRouteBuilder(
+              transitionDuration: Duration(milliseconds: 500),
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  ChangeNotifierProvider(
+                create: (context) => NavigationController(),
+                child: NavigationMenu(),
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                final offsetAnimation = Tween<Offset>(
+                  begin: Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOut,
+                ));
+
+                return SlideTransition(
+                  position: offsetAnimation,
+                  child: child,
+                );
+              },
+            ),
+            (Route<dynamic> route) => false);
+      }
+    } catch (e) {
+      print('Ocurrio un error al enviar los datos $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+          "Error al registrar, intentalo de nuevo",
+        )));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -71,80 +141,86 @@ class SignInScreen extends StatelessWidget {
                         ],
                       ),
                       Form(
+                          key: _keyForm,
                           child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25, vertical: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const TexfieldformPerso(
-                             
-                              hinText: "Email",
-                              icon: Icons.email_rounded,
-                            ),
-                            const SizedBox(height: 20),
-                            const TexfieldformPerso(
-                              hinText: "Password",
-                              icon: Icons.password_rounded,
-                            ),
-                            SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 25),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                //hacer remember me
-                                InkWell(
-                                  child: Text(
-                                    "¿Olvidaste tu contraseña?",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13),
-                                  ),
+                                TexfieldformPerso(
+                                  controller: _correoController,
+                                  hinText: "Email",
+                                  icon: Icons.email_rounded,
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 120),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: size.width * 1,
-                                  height: 60,
-                                  child: ElevatedButtonSign(
-                                    text: "Iniciar sesion",
-                                    onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationMenu()));
-                                    },
-                                  ),
+                                const SizedBox(height: 20),
+                                TexfieldformPerso(
+                                  controller: _contrasenaController,
+                                  hinText: "Password",
+                                  icon: Icons.password_rounded,
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(height: 20),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      "¿No tienes una cuenta?",
-                                      style: TextStyle(fontSize: 13),
-                                    ),
-                                    SizedBox(width: 10),
+                                    //hacer remember me
                                     InkWell(
-                                      onTap: () {
-                                        Navigator.pushNamed(context, '/register');
-                                      },
                                       child: Text(
-                                        "Registrate aqui",
+                                        "¿Olvidaste tu contraseña?",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Color.fromARGB(
-                                                255, 27, 63, 154)),
+                                            fontSize: 13),
                                       ),
+                                    ),
+                                    ElevatedButton(onPressed: (){
+                                      Navigator.pushNamed(context, '/home');
+                                    }, 
+                                    child: Text("prueba"))
+                                  ],
+                                ),
+                                const SizedBox(height: 120),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: size.width * 1,
+                                      height: 60,
+                                      child: ElevatedButtonSign(
+                                        text: "Iniciar sesion",
+                                        onPressed: _goToNextScreen,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "¿No tienes una cuenta?",
+                                          style: TextStyle(fontSize: 13),
+                                        ),
+                                        SizedBox(width: 10),
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/register');
+                                          },
+                                          child: Text(
+                                            "Registrate aqui",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Color.fromARGB(
+                                                    255, 27, 63, 154)),
+                                          ),
+                                        )
+                                      ],
                                     )
                                   ],
-                                )
+                                ),
                               ],
                             ),
-                          ],
-                        ),
-                      ))
+                          ))
                     ],
                   ),
                 )

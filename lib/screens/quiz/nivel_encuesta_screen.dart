@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:read_up/provider/registration_provider.dart';
 import 'package:read_up/screens/quiz/objetivos_screen.dart';
 import 'package:read_up/widgets/button_quiz.dart';
 
@@ -10,12 +12,45 @@ class NivelLectorScreen extends StatefulWidget {
 }
 
 class _NivelLectorScreenState extends State<NivelLectorScreen> {
+
+    void _goToNextScreen(){
+      final registrationProvider = context.read<RegistrationProvider>();
+      registrationProvider.setNivelLector(_nivelSeleccionado!);
+
+      Navigator.push(
+          context,
+          PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 500),
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                ObjetivosScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              final offsetAnimation = Tween<Offset>(
+                begin: Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOut,
+              ));
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
+          ),
+        );
+    }
+
+
   String? _nivelSeleccionado;
 
-  final List<String> _niveles = ['Avanzado', 'Intermedio', 'Aprendiz'];
+  final List<String> _niveles = ['avanzado', 'intermedio', 'principiante'];
 
   @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
     final size = MediaQuery.of(context).size;
 
     Widget buildNivelButton(String nivel) {
@@ -75,7 +110,7 @@ class _NivelLectorScreenState extends State<NivelLectorScreen> {
             height: 70,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ButtonQuiz(screen: ObjetivosScreen(), isEnable: _nivelSeleccionado != null,),
+              child: ButtonQuiz(onPressed: _goToNextScreen, isEnable: _nivelSeleccionado != null,),
             )
           ),
         ],

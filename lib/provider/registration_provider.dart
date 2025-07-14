@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 class RegistrationProvider with ChangeNotifier {
   //parametros del madafokin registro
-  String? _nombreDeUsuario;
+  String? _nombreUsuario;
   String? _correo;
   String? _contrasena;
   int? _edad;
@@ -22,7 +22,7 @@ class RegistrationProvider with ChangeNotifier {
 
 //inician los getters xd
 
-  String? get nombreDeUsuario => _nombreDeUsuario;
+  String? get nombreDeUsuario => _nombreUsuario;
   String? get correo => _correo;
   int? get edad => _edad;
   String? get generoSexual => _generoSexual;
@@ -37,11 +37,11 @@ class RegistrationProvider with ChangeNotifier {
     entonces se hace un setter solo para esos 3, asi con las demas vistas */
 
   void updateCredentials(
-    String nombreDeUsuario,
+    String nombreUsuario,
     String correo,
     String contrasena,
   ) {
-    _nombreDeUsuario = nombreDeUsuario;
+    _nombreUsuario = nombreUsuario;
     _correo = correo;
     _contrasena = contrasena;
   }
@@ -71,14 +71,14 @@ class RegistrationProvider with ChangeNotifier {
 
     Map<String, dynamic> toJson(){
       return {
-        'nombreDeusuario': _nombreDeUsuario,
+        'nombreUsuario': _nombreUsuario,
         'correo' : _correo,
         'contraseña' : _contrasena,
         'edad' : _edad,
         'generoSexual' : _generoSexual,
         'generosFavoritos' : _generosFavoritos,
         'nivelLector' : _nivelLector,
-        'objetivosLector' : _objetivoLector,
+        'objetivoLector' : _objetivoLector,
         'paginasDiarias' : _paginasDiarias,
         'objetivoSemanal' : _objetivoSemanal
       };

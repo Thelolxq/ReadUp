@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:read_up/provider/registration_provider.dart';
 import 'package:read_up/screens/quiz/sexo_encuesta_screen.dart';
 import 'package:read_up/widgets/button_quiz.dart';
 
@@ -15,6 +17,34 @@ class _EdadEncuestaScreenState extends State<EdadEncuestaScreen> {
       FixedExtentScrollController(initialItem: 13);
 
   List<int> _edades = List.generate(96, (index) => index + 5);
+
+  void _goToNextScreen() {
+    FocusScope.of(context).unfocus();
+
+    final registrationProvider = context.read<RegistrationProvider>();
+
+    registrationProvider.setEdad(_edadSeleccionada);
+
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 500),
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                SexoScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              final offseAnimation = Tween<Offset>(
+                begin: Offset(0, 1),
+                end: Offset.zero,
+              ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut));
+
+              return SlideTransition(
+                position: offseAnimation,
+                child: child,
+              );
+            }));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +73,9 @@ class _EdadEncuestaScreenState extends State<EdadEncuestaScreen> {
                       color: Color.fromARGB(255, 27, 63, 154)),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(
                   "Dejanos saber tu edad para poder personalizar cosas solo para ti",
                   textAlign: TextAlign.center,
@@ -95,7 +127,9 @@ class _EdadEncuestaScreenState extends State<EdadEncuestaScreen> {
             height: 70,
             child: Padding(
               padding: EdgeInsets.all(8.0),
-              child: ButtonQuiz(screen: SexoScreen()),
+              child: ButtonQuiz(
+                onPressed: _goToNextScreen,
+              ),
             ),
           ),
         ],

@@ -1,11 +1,23 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:read_up/screens/homePages/home_screen.dart';
 import 'package:read_up/screens/homePages/favorites_screen.dart';
 import 'package:read_up/screens/homePages/profile_screen.dart';
-class NavigationController extends GetxController{
+class NavigationController with ChangeNotifier{
   
 
-  final Rx<int> selectedIndex = 0.obs;
-  final screens = [HomeScreen(), FavoritesScreen(), ProfileScreen() ];
+  int _selectedIndex = 0;
+
+  int get selectedIndex => _selectedIndex;
+
+
+  final screens = [HomeScreen(), FavoritesScreen(), ProfileScreen()];
+
+
+  void updateIndex(int index){
+    _selectedIndex = index;
+    notifyListeners();
+  }
+  
+
 
 }
