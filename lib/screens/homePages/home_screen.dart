@@ -9,6 +9,109 @@ class HomeScreen extends StatelessWidget {
     super.key,
   });
 
+
+  void _showBookDetailsModal(BuildContext context, String bookPath) {
+    showModalBottomSheet(
+      context: context,
+      // Hace que el modal pueda ser más alto que la mitad de la pantalla
+      isScrollControlled: true,
+      // Esquinas redondeadas para el modal
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        // Usamos FractionallySizedBox para que el modal ocupe el 85% de la pantalla
+        return FractionallySizedBox(
+          heightFactor: 0.85,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: SingleChildScrollView( // Para poder hacer scroll si el contenido es muy largo
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  // Muestra la imagen del libro en grande
+                  Center(
+                    child: Container(
+                      height: 250,
+                      width: 180,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          image: AssetImage(bookPath),
+                          fit: BoxFit.cover,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Información de ejemplo del libro
+                  Text(
+                    'Título del Libro',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Nombre del Autor',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 20),
+                      SizedBox(width: 4),
+                      Text('4.5', style: TextStyle(fontSize: 16)),
+                      SizedBox(width: 20),
+                      Icon(Icons.book, color: Colors.grey, size: 20),
+                      SizedBox(width: 4),
+                      Text('280 páginas', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                  SizedBox(height: 24),
+                  Text(
+                    'Sinopsis',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Aquí va una descripción larga y detallada del libro. '
+                    'Puede ser un resumen de la trama, información sobre los personajes '
+                    'y cualquier otro detalle que pueda interesar al lector. Este texto '
+                    'puede ser lo suficientemente largo como para necesitar hacer scroll.',
+                    style: TextStyle(fontSize: 16, height: 1.5),
+                  ),
+                  SizedBox(height: 30),
+                   Center(
+                     child: ElevatedButton(
+                                     onPressed: () {},
+                                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[800],
+                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)
+                      )
+                                     ),
+                                     child: Text("Empezar a leer", style: TextStyle(color: Colors.white, fontSize: 16),),
+                                   ),
+                   ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     final List<String> bookList = [
@@ -98,37 +201,58 @@ class HomeScreen extends StatelessWidget {
             ),
             Column(
               children: [
-                CarouselSlider(
-                    options: CarouselOptions(
-                        viewportFraction: .4,
-                        pageSnapping: true,
-                        initialPage: 0,
-                        height: 50,
-                        enlargeCenterPage: false),
-                    items: generos.map((valor) {
-                      return Builder(builder: (BuildContext context) {
-                        return Center(
-                          
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12))),
-                                onPressed: () {},
-                                child: Text(
-                                  valor,
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                )));
-                      });
-                    }).toList()),
+                ShaderMask(
+                  shaderCallback: (Rect bounds){
+                    return LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: <Color>[
+                      Colors.blue.shade800,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.blue.shade800,
+                    ],
+                    stops: [0,0.1,0.9,1.0]
+                    ).createShader(bounds);
+                  },
+                  blendMode: BlendMode.dstOut,
+                  child: CarouselSlider(
+                      options: CarouselOptions(
+                          viewportFraction: .4,
+                          pageSnapping: true,
+                          initialPage: 0,
+                          height: 50,
+                          enlargeCenterPage: false),
+                      items: generos.map((valor) {
+                        return Builder(builder: (BuildContext context) {
+                          return Container(
+                            width: size.width,
+                            
+                            margin: EdgeInsets.symmetric(horizontal: 10),
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      elevation: 1,
+                                      shadowColor: Colors.black,
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12))),
+                                    onPressed: () {},
+                                    child: Text(
+                                      valor,
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ))
+                          );
+                        });
+                      }).toList()),
+                ),
               ],
             ),
             SizedBox(
-              height: 100,
+              height: 50,
             ),
             ClipPath(
               clipper: CurvedHome(),
@@ -172,22 +296,24 @@ class HomeScreen extends StatelessWidget {
                             initialPage: 0,
                             enlargeCenterPage: true),
                         items: bookList.map((ruta) {
-                          return Builder(
-                            builder: (BuildContext context) {
-                              return Container(
-                                decoration:
-                                    BoxDecoration(boxShadow: <BoxShadow>[
-                                  BoxShadow(
-                                      color: const Color.fromARGB(110, 0, 0, 0),
-                                      blurRadius: 4)
-                                ]),
-                                width: 150,
-                                child: Image.asset(
-                                  ruta,
-                                  fit: BoxFit.cover,
-                                ),
-                              );
+                          return GestureDetector(
+                            onTap: (){
+                              _showBookDetailsModal(context, ruta);
                             },
+                            child: Container(
+                              decoration:
+                                  BoxDecoration(
+                                    boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                    color: const Color.fromARGB(110, 0, 0, 0),
+                                    blurRadius: 4)
+                              ]),
+                              width: 150,
+                              child: Image.asset(
+                                ruta,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
                           );
                         }).toList())
                   ],
