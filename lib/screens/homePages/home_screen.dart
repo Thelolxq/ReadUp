@@ -133,6 +133,9 @@ class HomeScreen extends StatelessWidget {
     ];
     final size = MediaQuery.of(context).size;
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: (){
+
+      }, child: Icon(Icons.book, size: 32,color: Colors.black,),backgroundColor: const Color.fromARGB(255, 255, 255, 255),),
       backgroundColor: Colors.blue[800],
       body: SingleChildScrollView(
         child: Column(
@@ -257,7 +260,7 @@ class HomeScreen extends StatelessWidget {
             ClipPath(
               clipper: CurvedHome(),
               child: Container(
-                color: Colors.white,
+                color: const Color.fromARGB(255, 249, 252, 255),
                 width: size.width,
                 height: size.height,
                 child: Column(

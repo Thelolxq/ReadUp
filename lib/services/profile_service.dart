@@ -7,19 +7,23 @@ class ProfileService {
 
 
   Future<User> getProfileWithToken(String token) async {
-    final url = Uri.parse('$_baseUrl/perfil/1');
 
+    if(token == null || token.isEmpty){
+      throw Exception("El token de autenticacion no se ha encontrado");
+    }
+
+    final url = Uri.parse('$_baseUrl/perfil');
+    print("hola $token");
+    
     try{
       final response = await http.get(
         url,
         headers: {
-          'Content_Type' : 'application/json; charset=UTF-8',
+          'Content-Type' : 'application/json; charset=UTF-8',
           'Authorization' : 'Bearer $token'
         },
         
       );
-
-
       if(response.statusCode == 200){
         return User.fromJson(jsonDecode(response.body));
       }else{

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:read_up/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
@@ -21,7 +22,8 @@ class AuthService {
       );
 
       if (response.statusCode == 201) {
-        print('usuario creado');
+        print('usuario creado ${response.body}');
+      
       } else {
         final errorData = jsonDecode(response.body);
         throw Exception('Error en el registro: ${errorData['error']}');
@@ -64,7 +66,7 @@ class AuthService {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final token = responseData['token'];
         if (token == null) {
