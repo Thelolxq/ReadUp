@@ -28,31 +28,8 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _isLoading = false;
 
   void _navigateHome() {
-    Navigator.pushAndRemoveUntil(
-        context,
-        PageRouteBuilder(
-          transitionDuration: Duration(milliseconds: 500),
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              ChangeNotifierProvider(
-            create: (context) => NavigationController(),
-            child: NavigationMenu(),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            final offsetAnimation = Tween<Offset>(
-              begin: Offset(0, 1),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOut,
-            ));
-
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-        ),
-        (Route<dynamic> route) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/home', (Route<dynamic> route) => false);
   }
 
   void _goToNextScreen() async {

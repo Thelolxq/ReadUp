@@ -26,7 +26,7 @@ class User {
      this.rango,
      this.historialBusqueda,
      this.edad, 
-     this. generoSexual,
+     this.generoSexual,
      this.generoFavoritos, 
      this.objetivoLector, 
      this.paginasDiarias,
