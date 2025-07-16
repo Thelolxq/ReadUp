@@ -27,56 +27,49 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool _isLoading = false;
 
-  void _navigateHome(){
-   Navigator.pushAndRemoveUntil(
-            context,
-            PageRouteBuilder(
-              transitionDuration: Duration(milliseconds: 500),
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  ChangeNotifierProvider(
-                create: (context) => NavigationController(),
-                child: NavigationMenu(),
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                final offsetAnimation = Tween<Offset>(
-                  begin: Offset(0, 1),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeOut,
-                ));
+  void _navigateHome() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        PageRouteBuilder(
+          transitionDuration: Duration(milliseconds: 500),
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              ChangeNotifierProvider(
+            create: (context) => NavigationController(),
+            child: NavigationMenu(),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final offsetAnimation = Tween<Offset>(
+              begin: Offset(0, 1),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOut,
+            ));
 
-                return SlideTransition(
-                  position: offsetAnimation,
-                  child: child,
-                );
-              },
-            ),
-            (Route<dynamic> route) => false);
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
+        ),
+        (Route<dynamic> route) => false);
   }
 
-
   void _goToNextScreen() async {
-
-    if(kDeveloperMode){
+    if (kDeveloperMode) {
       print("Modo desarrollador activado: saltando login");
-    final fakeuser = User(
-      correo: "dev@gmail.com",
-    );
+      final fakeuser = User(
+        correo: "dev@gmail.com",
+      );
 
+      context.read<SessionProvider>().setUser(fakeuser);
 
-    context.read<SessionProvider>().setUser(fakeuser);
+      _navigateHome();
 
-    _navigateHome();
-
-    return;
-
-
+      return;
     }
 
-  if(!_keyForm.currentState!.validate()) return;
-
+    if (!_keyForm.currentState!.validate()) return;
 
     final authService = AuthService();
     final profileService = ProfileService();
@@ -94,10 +87,8 @@ class _SignInScreenState extends State<SignInScreen> {
       print(token);
       User usuarioLogueado = await profileService.getProfileWithToken(token);
 
-      if (mounted) {
-        context.read<SessionProvider>().setUser(usuarioLogueado);
-        _navigateHome();
-      }
+      context.read<SessionProvider>().setUser(usuarioLogueado);
+      _navigateHome();
     } catch (e) {
       print('Ocurrio un error al enviar los datos $e');
       if (mounted) {
@@ -183,8 +174,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 TexfieldformPerso(
-                                  validator: (value){
-                                    if(value == null || value.isEmpty){
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
                                       return 'Por favor, ingresa un correo';
                                     }
                                     return null;
@@ -195,8 +186,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                 ),
                                 const SizedBox(height: 20),
                                 TexfieldformPerso(
-                                   validator: (value){
-                                    if(value == null || value.isEmpty){
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
                                       return 'Por favor, ingresa una contraseña';
                                     }
                                     return null;

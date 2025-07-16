@@ -2,35 +2,73 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:read_up/models/book.dart';
+import 'package:read_up/services/auth_service.dart';
+import 'package:read_up/services/book_service.dart';
+import 'package:read_up/widgets/carousel_books.dart';
+import 'package:read_up/widgets/carousel_generos.dart';
 import 'package:read_up/widgets/curved_home.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
   });
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-  void _showBookDetailsModal(BuildContext context, String bookPath) {
+class _HomeScreenState extends State<HomeScreen> {
+  final AuthService _authService = AuthService();
+  final BookService _bookService = BookService();
+  List<Book>? _books;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getBooks();
+  }
+
+  Future<void> _getBooks() async {
+    try {
+      final String? token = await _authService.getToken();
+      final books = await _bookService.getLibros(token);
+
+      setState(() {
+        _books = books;
+        _isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        _errorMessage = error.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showBookDetailsModal(BuildContext context, Book book) {
     showModalBottomSheet(
+      showDragHandle: true,
+      enableDrag: false,
       context: context,
-      // Hace que el modal pueda ser más alto que la mitad de la pantalla
       isScrollControlled: true,
-      // Esquinas redondeadas para el modal
+      backgroundColor: const Color.fromARGB(255, 66, 122, 160),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-        // Usamos FractionallySizedBox para que el modal ocupe el 85% de la pantalla
         return FractionallySizedBox(
           heightFactor: 0.85,
           child: Container(
             padding: EdgeInsets.all(20),
-            child: SingleChildScrollView( // Para poder hacer scroll si el contenido es muy largo
+            child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  // Muestra la imagen del libro en grande
                   Center(
                     child: Container(
                       height: 250,
@@ -38,69 +76,79 @@ class HomeScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         image: DecorationImage(
-                          image: AssetImage(bookPath),
+                          image: NetworkImage(book.urlPortada),
                           fit: BoxFit.cover,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
+                        // ... (sombra)
                       ),
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Información de ejemplo del libro
                   Text(
-                    'Título del Libro',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    book.titulo,
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Nombre del Autor',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                    'Autor ID: ${book.idAutor}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: const Color.fromARGB(255, 224, 223, 223),
+                    ),
                   ),
                   SizedBox(height: 16),
                   Row(
                     children: [
                       Icon(Icons.star, color: Colors.amber, size: 20),
                       SizedBox(width: 4),
-                      Text('4.5', style: TextStyle(fontSize: 16)),
+                      Text('4.5',
+                          style: TextStyle(
+                              fontSize: 16, color: Colors.blue.shade200)),
                       SizedBox(width: 20),
-                      Icon(Icons.book, color: Colors.grey, size: 20),
+                      Icon(
+                        Icons.book,
+                        color: const Color.fromARGB(255, 255, 255, 255),
+                        size: 20,
+                      ),
                       SizedBox(width: 4),
-                      Text('280 páginas', style: TextStyle(fontSize: 16)),
+                      Text('${book.numPaginas} páginas',
+                          style: TextStyle(
+                              fontSize: 16, color: Colors.blue.shade200)),
                     ],
                   ),
                   SizedBox(height: 24),
                   Text(
                     'Sinopsis',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Aquí va una descripción larga y detallada del libro. '
-                    'Puede ser un resumen de la trama, información sobre los personajes '
-                    'y cualquier otro detalle que pueda interesar al lector. Este texto '
-                    'puede ser lo suficientemente largo como para necesitar hacer scroll.',
-                    style: TextStyle(fontSize: 16, height: 1.5),
+                    book.sinopsis,
+                    style: TextStyle(
+                        fontSize: 16, height: 1.5, color: Colors.white),
                   ),
                   SizedBox(height: 30),
-                   Center(
-                     child: ElevatedButton(
-                                     onPressed: () {},
-                                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[800],
-                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)
-                      )
-                                     ),
-                                     child: Text("Empezar a leer", style: TextStyle(color: Colors.white, fontSize: 16),),
-                                   ),
-                   ),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[800],
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12))),
+                      child: Text(
+                        "Empezar a leer",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -110,18 +158,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    final List<String> bookList = [
-      "assets/libros/libro1.jpg",
-      "assets/libros/libro2.jpg",
-      "assets/libros/libro3.jpg",
-      "assets/libros/libro4.jpg",
-      "assets/libros/libro5.jpg",
-    ];
-
     final List<String> generos = [
       "Terror",
       "Comedia",
@@ -133,9 +171,15 @@ class HomeScreen extends StatelessWidget {
     ];
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: (){
-
-      }, child: Icon(Icons.book, size: 32,color: Colors.black,),backgroundColor: const Color.fromARGB(255, 255, 255, 255),),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(
+          Icons.book,
+          size: 32,
+          color: Colors.black,
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      ),
       backgroundColor: Colors.blue[800],
       body: SingleChildScrollView(
         child: Column(
@@ -205,52 +249,25 @@ class HomeScreen extends StatelessWidget {
             Column(
               children: [
                 ShaderMask(
-                  shaderCallback: (Rect bounds){
+                  shaderCallback: (Rect bounds) {
                     return LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: <Color>[
-                      Colors.blue.shade800,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.blue.shade800,
-                    ],
-                    stops: [0,0.1,0.9,1.0]
-                    ).createShader(bounds);
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: <Color>[
+                          Colors.blue.shade800,
+                          Colors.transparent,
+                          Colors.transparent,
+                          Colors.blue.shade800,
+                        ],
+                        stops: [
+                          0,
+                          0.1,
+                          0.9,
+                          1.0
+                        ]).createShader(bounds);
                   },
                   blendMode: BlendMode.dstOut,
-                  child: CarouselSlider(
-                      options: CarouselOptions(
-                          viewportFraction: .4,
-                          pageSnapping: true,
-                          initialPage: 0,
-                          height: 50,
-                          enlargeCenterPage: false),
-                      items: generos.map((valor) {
-                        return Builder(builder: (BuildContext context) {
-                          return Container(
-                            width: size.width,
-                            
-                            margin: EdgeInsets.symmetric(horizontal: 10),
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      elevation: 1,
-                                      shadowColor: Colors.black,
-                                        backgroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12))),
-                                    onPressed: () {},
-                                    child: Text(
-                                      valor,
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ))
-                          );
-                        });
-                      }).toList()),
+                  child: CarouselGeneros(generos: generos, size: size),
                 ),
               ],
             ),
@@ -289,36 +306,7 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    CarouselSlider(
-                        options: CarouselOptions(
-                            viewportFraction: .4,
-                            pageSnapping: true,
-                            autoPlay: true,
-                            autoPlayAnimationDuration: Duration(seconds: 2),
-                            height: 250.0,
-                            initialPage: 0,
-                            enlargeCenterPage: true),
-                        items: bookList.map((ruta) {
-                          return GestureDetector(
-                            onTap: (){
-                              _showBookDetailsModal(context, ruta);
-                            },
-                            child: Container(
-                              decoration:
-                                  BoxDecoration(
-                                    boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: const Color.fromARGB(110, 0, 0, 0),
-                                    blurRadius: 4)
-                              ]),
-                              width: 150,
-                              child: Image.asset(
-                                ruta,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          );
-                        }).toList())
+                    _buildPopularBooksSection()
                   ],
                 ),
               ),
@@ -326,6 +314,43 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+  // DENTRO DE _HomeScreenState en home_screen.dart
+
+  Widget _buildPopularBooksSection() {
+    // GUARDIA 1: Si está cargando, muestra el spinner.
+    if (_isLoading) {
+      return Center(heightFactor: 5, child: CircularProgressIndicator());
+    }
+
+    // GUARDIA 2: Si hay un error, muéstralo.
+    if (_errorMessage != null) {
+      return Center(
+        heightFactor: 5,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            _errorMessage!,
+            style: TextStyle(color: Colors.red, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    // GUARDIA 3: Si la lista es nula o vacía, muestra el mensaje.
+    if (_books == null || _books!.isEmpty) {
+      return Center(heightFactor: 5, child: Text("No hay libros disponibles."));
+    }
+
+    // CASO DE ÉXITO: Si hemos pasado todas las guardias, es seguro construir CarouselBooks.
+    // Ahora sí podemos usar `_books!` sin miedo.
+    return CarouselBooks(
+      books: _books!,
+      onTap: (bookTocado) {
+        _showBookDetailsModal(context, bookTocado);
+      },
     );
   }
 }

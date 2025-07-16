@@ -25,17 +25,18 @@ class _ObjetivosScreenState extends State<ObjetivosScreen> {
         _objetivoSemanalSeleccionado!, int.parse(_paginasPorDia));
     final AuthService authService = AuthService();
     try {
-        print("intentando registrar con los siguientes datos${registrationProvider.toJson()}");
-        await authService.register(registrationProvider.toJson());
-        print("Registro en la api exitoso");
+      print(
+          "intentando registrar con los siguientes datos${registrationProvider.toJson()}");
+      await authService.register(registrationProvider.toJson());
+      print("Registro en la api exitoso");
 
-        if (mounted) {
-          Navigator.pushAndRemoveUntil(
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
             context,
             PageRouteBuilder(
               transitionDuration: Duration(milliseconds: 500),
               pageBuilder: (context, animation, secondaryAnimation) =>
-                SignInScreen(),
+                  SignInScreen(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 final offsetAnimation = Tween<Offset>(
@@ -52,15 +53,16 @@ class _ObjetivosScreenState extends State<ObjetivosScreen> {
                 );
               },
             ),
-            (Route<dynamic> route) => false
-          );
-        }
-      
+            (Route<dynamic> route) => false);
+      }
     } catch (error) {
-      print('Ocurrio un error al enviar los datos');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error al registrar, intentalo de nuevo", )));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(error
+              .toString()
+              .replaceAll('Exception: ', '')), // Muestra el mensaje de error
+          backgroundColor: Colors.red,
+        ));
       }
     }
   }

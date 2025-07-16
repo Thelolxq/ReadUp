@@ -12,12 +12,15 @@ class ElevatedButtonSign extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
         onPressed: onPressed,
+        
         style: ElevatedButton.styleFrom(
+         
             backgroundColor: const Color.fromARGB(255, 27, 63, 154),
             foregroundColor: Colors.white),
         child: (isLoading ?? false) 
             ? const CircularProgressIndicator(
                 color: Colors.white,
+                
               )
             : Text(
                 text,

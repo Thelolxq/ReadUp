@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:read_up/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String _baseUrl = 'https://readup.zapto.org';
   static const String _tokenKey = 'auth_token';
+
   Future<void> register(Map<String, dynamic> registrationData) async {
     final url = Uri.parse('$_baseUrl/registro');
 
@@ -23,30 +23,31 @@ class AuthService {
 
       if (response.statusCode == 201) {
         print('usuario creado ${response.body}');
-      
       } else {
-        final errorData = jsonDecode(response.body);
-        throw Exception('Error en el registro: ${errorData['error']}');
+        print('El servidor respondió con un error.');
+        print('Status Code: ${response.statusCode}');
+        print('Cuerpo de la respuesta (raw): ${response.body}');
+
+        try {
+          final errorData = jsonDecode(response.body);
+
+          final errorMessage = errorData['message'] ??
+              errorData['error'] ??
+              'Error desconocido desde la API.';
+          throw Exception(errorMessage);
+        } catch (e) {
+          throw Exception('Error en el inicio de sesión: ${response.body}');
+        }
       }
-    } catch (error) {
+    } on TimeoutException catch (_) {
       throw Exception(
-          'Fallo la conexión con el servidor. Inténtalo de nuevo $error.');
+          'El servidor tardo demasiado en responde. Revisa tu conexion a internet');
+    } on SocketException catch (_) {
+      throw Exception(
+          'No se pudo conectar al servidor. Revisa tu conexión a internet.');
+    } catch (e) {
+      throw e;
     }
-  }
-
-  Future<void> _saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
-  }
-
-  Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
-  }
-
-  Future<void> deleteToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
   }
 
   Future<String> login(String correo, String contrasena) async {
@@ -105,5 +106,20 @@ class AuthService {
       print('Catch final en AuthService: $e');
       throw e; // Relanza el error para que la UI pueda manejarlo
     }
+  }
+
+  Future<void> _saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
+  }
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
+  Future<void> deleteToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
   }
 }

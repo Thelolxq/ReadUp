@@ -1,19 +1,23 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:jwt_decode/jwt_decode.dart';
 import 'package:read_up/models/user.dart';
 class ProfileService {
   static const String _baseUrl = "https://readup.zapto.org";
 
 
-  Future<User> getProfileWithToken(String token) async {
 
+  Future<User> getProfileWithToken(String token) async {
+    
     if(token == null || token.isEmpty){
       throw Exception("El token de autenticacion no se ha encontrado");
     }
 
-    final url = Uri.parse('$_baseUrl/perfil');
-    print("hola $token");
+    Map<String, dynamic> payload = Jwt.parseJwt(token);
+      int id = payload['id'];
+  print(id);
+    final url = Uri.parse('$_baseUrl/perfil/$id');
     
     try{
       final response = await http.get(
