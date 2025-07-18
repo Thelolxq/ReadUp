@@ -30,7 +30,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
   @override
   Widget build(BuildContext context) {
-
+    
     final controller = context.watch<NavigationController>();
     final year = DateTime.now().year;
 
@@ -42,7 +42,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
 NavigationBar(
             overlayColor: WidgetStatePropertyAll(Colors.transparent),
             surfaceTintColor: Colors.transparent,
-            indicatorColor: Colors.blue[800],
+            indicatorColor: Colors.blue[600],
             height: 80,
             elevation: 30,
             animationDuration: Duration(seconds: 1),
@@ -52,10 +52,10 @@ NavigationBar(
             onDestinationSelected: (index) =>
                 context.read<NavigationController>().updateIndex(index),
             destinations: [
-              NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+              NavigationDestination(icon: Icon(Icons.home, color: controller.selectedIndex == 0 ? Colors.white : Colors.black,), label: 'Home'),
               NavigationDestination(
-                  icon: Icon(Icons.favorite), label: 'Favorite'),
-              NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+                  icon: Icon(Icons.favorite,  color: controller.selectedIndex == 1 ? Colors.white : Colors.black), label: 'Favorite'),
+              NavigationDestination(icon: Icon(Icons.person,  color: controller.selectedIndex == 2 ? Colors.white : Colors.black), label: 'Profile'),
             ],
       ),
       backgroundColor: Colors.blue[800],

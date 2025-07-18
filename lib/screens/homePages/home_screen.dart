@@ -1,12 +1,16 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 
 import 'package:flutter/material.dart';
 import 'package:read_up/models/book.dart';
+import 'package:read_up/models/generos.dart';
 import 'package:read_up/services/auth_service.dart';
 import 'package:read_up/services/book_service.dart';
+import 'package:read_up/services/generos_service.dart';
 import 'package:read_up/widgets/carousel_books.dart';
 import 'package:read_up/widgets/carousel_generos.dart';
 import 'package:read_up/widgets/curved_home.dart';
+import 'package:read_up/widgets/curved_show_menu.dart';
+import 'package:read_up/screens/homePages/book_reader.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -20,15 +24,39 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   final BookService _bookService = BookService();
+  final GenerosService _generosService = GenerosService();
   List<Book>? _books;
+  List<Generos>? _generos;
   bool _isLoading = true;
   String? _errorMessage;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _getBooks();
+    _getGeneros();
+  }
+  Future<void> _getGeneros() async {
+    try{
+      final String? token = await _authService.getToken();
+      final generos = await _generosService.getGeneros(token);
+
+      if(mounted){
+        setState(() {
+          _generos = generos;
+          _isLoading = false;
+        });
+      }
+
+    }catch(error){
+      if(mounted){
+        setState(() {
+          _errorMessage = "Error al ver los generos";
+          _isLoading = false;
+        });
+      }
+
+    }
   }
 
   Future<void> _getBooks() async {
@@ -36,25 +64,57 @@ class _HomeScreenState extends State<HomeScreen> {
       final String? token = await _authService.getToken();
       final books = await _bookService.getLibros(token);
 
-      setState(() {
-        _books = books;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _books = books;
+          _isLoading = false;
+        });
+      }
     } catch (error) {
-      setState(() {
-        _errorMessage = error.toString();
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = "Error al ver los libros";
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  void _showBookDetailsModal(BuildContext context, Book book) {
+
+  void _showMoreGeneros(BuildContext context){
     showModalBottomSheet(
+      showDragHandle: true,
+      enableDrag: false,
+      isScrollControlled: true,
+      context: context,
+      backgroundColor: Colors.blue[600],
+      builder: (BuildContext context){
+      return FractionallySizedBox(
+        heightFactor: 0.85,
+        widthFactor: 1,
+        child: ClipPath(
+          clipper: CurvedShowMenu(),
+          child: Container(
+           color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 50),
+                child: Text("Generos"),
+              ),
+          ),
+        ),
+      );
+    });
+  }
+
+  void _showBookDetailsModal(BuildContext context, Book book) {
+    print("${book.urlPortada} hola");
+    showModalBottomSheet(
+      
       showDragHandle: true,
       enableDrag: false,
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color.fromARGB(255, 66, 122, 160),
+      backgroundColor: Colors.blue[600],
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -135,7 +195,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 30),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                         Navigator.pop(context);
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookReaderView(
+                             bookUrl: book.url,
+                            ),
+                          ),
+                        );
+
+                      },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue[800],
                           padding: EdgeInsets.symmetric(
@@ -159,39 +231,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> generos = [
-      "Terror",
-      "Comedia",
-      "Romance",
-      "Rom-Com",
-      "Historia",
-      "Ciencia Ficcion",
-      "Drama",
-    ];
+    if(_isLoading){
+      return const Center(child: CircularProgressIndicator(),);
+    }
+
+    if(_generos == null){
+      return const Center(child: Text("No se ha podido visualizar los libros"),);
+    }
+    final List<Generos> generosPasar = _generos!;
+
     final size = MediaQuery.of(context).size;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        child: Icon(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        child: const Icon(
           Icons.book,
           size: 32,
           color: Colors.black,
         ),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       backgroundColor: Colors.blue[800],
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 40),
+          const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: TextField(
                 cursorColor: Colors.white,
                 style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  const  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
-                    label: Text(
+                    label: const Text(
                       "Buscar",
                       style: TextStyle(
                         color: Colors.white,
@@ -201,16 +273,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     floatingLabelBehavior: FloatingLabelBehavior.never,
                     filled: true,
                     fillColor: Colors.blue[600],
-                    border: OutlineInputBorder(
+                    border:  OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(style: BorderStyle.none)),
+                        borderSide: const  BorderSide(style: BorderStyle.none)),
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(style: BorderStyle.none)),
+                        borderSide: const BorderSide(style: BorderStyle.none)),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(style: BorderStyle.none)),
-                    prefixIcon: Icon(
+                        borderSide: const BorderSide(style: BorderStyle.none)),
+                    prefixIcon: const Icon(
                       Icons.search,
                       color: Colors.white,
                     )),
@@ -222,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Generos",
                     style: TextStyle(
                         fontSize: 20,
@@ -234,15 +306,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: IconButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12))),
-                      onPressed: () {},
-                      icon: Icon(
+                      onPressed: () {
+                        _showMoreGeneros(context);
+                      },
+                      icon: const Icon(
                         Icons.more_horiz,
                         size: 30,
                       ))
                 ],
               ),
             ),
-            SizedBox(
+           const SizedBox(
               height: 20,
             ),
             Column(
@@ -258,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Colors.transparent,
                           Colors.blue.shade800,
                         ],
-                        stops: [
+                        stops: const [
                           0,
                           0.1,
                           0.9,
@@ -266,11 +340,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ]).createShader(bounds);
                   },
                   blendMode: BlendMode.dstOut,
-                  child: CarouselGeneros(generos: generos, size: size),
+                  child: CarouselGeneros(generos: generosPasar, size: size)
                 ),
               ],
             ),
-            SizedBox(
+           const SizedBox(
               height: 50,
             ),
             ClipPath(
@@ -282,11 +356,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 50, left: 30, right: 20),
+                      padding: const EdgeInsets.only(top: 50, left: 30, right: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                         const Text(
                             "Populares",
                             style: TextStyle(
                                 color: Colors.black,
@@ -298,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12))),
                               onPressed: () {},
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.more_horiz,
                                 size: 30,
                               ))
@@ -315,15 +389,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  // DENTRO DE _HomeScreenState en home_screen.dart
+  
 
   Widget _buildPopularBooksSection() {
-    // GUARDIA 1: Si está cargando, muestra el spinner.
     if (_isLoading) {
       return Center(heightFactor: 5, child: CircularProgressIndicator());
     }
 
-    // GUARDIA 2: Si hay un error, muéstralo.
     if (_errorMessage != null) {
       return Center(
         heightFactor: 5,
@@ -338,13 +410,11 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // GUARDIA 3: Si la lista es nula o vacía, muestra el mensaje.
     if (_books == null || _books!.isEmpty) {
       return Center(heightFactor: 5, child: Text("No hay libros disponibles."));
     }
 
-    // CASO DE ÉXITO: Si hemos pasado todas las guardias, es seguro construir CarouselBooks.
-    // Ahora sí podemos usar `_books!` sin miedo.
+
     return CarouselBooks(
       books: _books!,
       onTap: (bookTocado) {

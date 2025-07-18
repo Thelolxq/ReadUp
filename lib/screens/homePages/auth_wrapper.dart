@@ -21,7 +21,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
   late final Future<void> _initFuture;
 
   @override
+
   void initState() {
+    super.initState();
     _initFuture = _tryAutoLogout();
   }
 

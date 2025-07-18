@@ -2,6 +2,7 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:read_up/models/generos.dart';
 
 class CarouselGeneros extends StatelessWidget {
   const CarouselGeneros({
@@ -10,7 +11,7 @@ class CarouselGeneros extends StatelessWidget {
     required this.size,
   });
 
-  final List<String> generos;
+  final List<Generos> generos;
   final Size size;
 
   @override
@@ -34,9 +35,11 @@ class CarouselGeneros extends StatelessWidget {
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12))),
-                    onPressed: () {},
+                    onPressed: (){
+
+                    },
                     child: Text(
-                      valor,
+                      valor.nombre,
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
