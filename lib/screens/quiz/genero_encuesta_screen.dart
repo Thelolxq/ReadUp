@@ -18,7 +18,7 @@ class _GeneroScreenState extends State<GeneroScreen> {
 
     final registrationProvider = context.read<RegistrationProvider>();
 
-    registrationProvider.setGenerosFavoritos(_generos);
+    registrationProvider.setGenerosFavoritos(_generosSeleccionados);
     Navigator.push(
           context,
           PageRouteBuilder(
@@ -62,7 +62,7 @@ class _GeneroScreenState extends State<GeneroScreen> {
     'Comedia',
   ];
 
-  final Set<String> _generosSeleccionados = {};
+  final List<String> _generosSeleccionados = [];
 
   @override
   Widget build(BuildContext context) {

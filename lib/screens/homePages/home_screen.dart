@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:read_up/models/book.dart';
 import 'package:read_up/models/generos.dart';
@@ -36,26 +34,25 @@ class _HomeScreenState extends State<HomeScreen> {
     _getBooks();
     _getGeneros();
   }
+
   Future<void> _getGeneros() async {
-    try{
+    try {
       final String? token = await _authService.getToken();
       final generos = await _generosService.getGeneros(token);
 
-      if(mounted){
+      if (mounted) {
         setState(() {
           _generos = generos;
           _isLoading = false;
         });
       }
-
-    }catch(error){
-      if(mounted){
+    } catch (error) {
+      if (mounted) {
         setState(() {
           _errorMessage = "Error al ver los generos";
           _isLoading = false;
         });
       }
-
     }
   }
 
@@ -80,36 +77,50 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Future<void> _createSesion(int bookId) async {
+  //   try{
+  //     final String? token  = await _authService.getToken();
+  //     if(token ==  null){
+  //       throw Exception("Token no encontrado");
+  //     }
 
-  void _showMoreGeneros(BuildContext context){
+  //     final String fechaIncio = DateTime.now()
+  //   }catch(error){
+
+  //   }
+  // }
+
+
+  
+
+  void _showMoreGeneros(BuildContext context) {
     showModalBottomSheet(
-      showDragHandle: true,
-      enableDrag: false,
-      isScrollControlled: true,
-      context: context,
-      backgroundColor: Colors.blue[600],
-      builder: (BuildContext context){
-      return FractionallySizedBox(
-        heightFactor: 0.85,
-        widthFactor: 1,
-        child: ClipPath(
-          clipper: CurvedShowMenu(),
-          child: Container(
-           color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 50),
-                child: Text("Generos"),
+        showDragHandle: true,
+        enableDrag: false,
+        isScrollControlled: true,
+        context: context,
+        backgroundColor: Colors.blue[600],
+        builder: (BuildContext context) {
+          return FractionallySizedBox(
+            heightFactor: 0.85,
+            widthFactor: 1,
+            child: ClipPath(
+              clipper: CurvedShowMenu(),
+              child: Container(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 50),
+                  child: Text("Generos"),
+                ),
               ),
-          ),
-        ),
-      );
-    });
+            ),
+          );
+        });
   }
 
   void _showBookDetailsModal(BuildContext context, Book book) {
     print("${book.urlPortada} hola");
     showModalBottomSheet(
-      
       showDragHandle: true,
       enableDrag: false,
       context: context,
@@ -196,17 +207,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                         Navigator.pop(context);
+                        Navigator.pop(context);
 
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => BookReaderView(
-                             bookUrl: book.url,
+                              bookName: book.titulo,
                             ),
                           ),
                         );
-
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue[800],
@@ -231,12 +241,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if(_isLoading){
-      return const Center(child: CircularProgressIndicator(),);
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
     }
 
-    if(_generos == null){
-      return const Center(child: Text("No se ha podido visualizar los libros"),);
+    if (_generos == null) {
+      return const Center(
+        child: Text("No se ha podido visualizar los libros"),
+      );
     }
     final List<Generos> generosPasar = _generos!;
 
@@ -255,13 +269,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-          const SizedBox(height: 40),
+            const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: TextField(
                 cursorColor: Colors.white,
-                style:
-                  const  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
                     label: const Text(
                       "Buscar",
@@ -273,9 +287,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     floatingLabelBehavior: FloatingLabelBehavior.never,
                     filled: true,
                     fillColor: Colors.blue[600],
-                    border:  OutlineInputBorder(
+                    border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const  BorderSide(style: BorderStyle.none)),
+                        borderSide: const BorderSide(style: BorderStyle.none)),
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(style: BorderStyle.none)),
@@ -316,35 +330,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-           const SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Column(
               children: [
                 ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: <Color>[
-                          Colors.blue.shade800,
-                          Colors.transparent,
-                          Colors.transparent,
-                          Colors.blue.shade800,
-                        ],
-                        stops: const [
-                          0,
-                          0.1,
-                          0.9,
-                          1.0
-                        ]).createShader(bounds);
-                  },
-                  blendMode: BlendMode.dstOut,
-                  child: CarouselGeneros(generos: generosPasar, size: size)
-                ),
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: <Color>[
+                            Colors.blue.shade800,
+                            Colors.transparent,
+                            Colors.transparent,
+                            Colors.blue.shade800,
+                          ],
+                          stops: const [
+                            0,
+                            0.1,
+                            0.9,
+                            1.0
+                          ]).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstOut,
+                    child: CarouselGeneros(generos: generosPasar, size: size)),
               ],
             ),
-           const SizedBox(
+            const SizedBox(
               height: 50,
             ),
             ClipPath(
@@ -356,11 +369,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 50, left: 30, right: 20),
+                      padding:
+                          const EdgeInsets.only(top: 50, left: 30, right: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                         const Text(
+                          const Text(
                             "Populares",
                             style: TextStyle(
                                 color: Colors.black,
@@ -389,7 +403,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
 
   Widget _buildPopularBooksSection() {
     if (_isLoading) {
@@ -413,7 +426,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_books == null || _books!.isEmpty) {
       return Center(heightFactor: 5, child: Text("No hay libros disponibles."));
     }
-
 
     return CarouselBooks(
       books: _books!,
