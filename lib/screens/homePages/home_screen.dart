@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:read_up/models/book.dart';
 import 'package:read_up/models/generos.dart';
+import 'package:read_up/models/review.dart';
 import 'package:read_up/services/auth_service.dart';
 import 'package:read_up/services/book_service.dart';
 import 'package:read_up/services/generos_service.dart';
@@ -9,6 +10,7 @@ import 'package:read_up/widgets/carousel_generos.dart';
 import 'package:read_up/widgets/curved_home.dart';
 import 'package:read_up/widgets/curved_show_menu.dart';
 import 'package:read_up/screens/homePages/book_reader.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -77,21 +79,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Future<void> _createSesion(int bookId) async {
-  //   try{
-  //     final String? token  = await _authService.getToken();
-  //     if(token ==  null){
-  //       throw Exception("Token no encontrado");
-  //     }
-
-  //     final String fechaIncio = DateTime.now()
-  //   }catch(error){
-
-  //   }
-  // }
-
-
-  
+  final List<Review> _mockReviews = [
+    Review(
+      userName: 'Ana López',
+      rating: 5,
+      comment:
+          '¡Una historia increíblemente absorbente! No pude dejar de leer. Totalmente recomendada.',
+      avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
+    ),
+    Review(
+      userName: 'Carlos García',
+      rating: 4,
+      comment:
+          'Muy buen libro, con personajes bien desarrollados y un mundo fascinante. El final fue un poco predecible.',
+      avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+    ),
+  ];
 
   void _showMoreGeneros(BuildContext context) {
     showModalBottomSheet(
@@ -119,10 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showBookDetailsModal(BuildContext context, Book book) {
-    print("${book.urlPortada} hola");
     showModalBottomSheet(
       showDragHandle: true,
-      enableDrag: false,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.blue[600],
@@ -130,112 +131,265 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          heightFactor: 0.85,
-          child: Container(
-            padding: EdgeInsets.all(20),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Center(
-                    child: Container(
-                      height: 250,
-                      width: 180,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                          image: NetworkImage(book.urlPortada),
-                          fit: BoxFit.cover,
-                        ),
-                        // ... (sombra)
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    book.titulo,
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Autor ID: ${book.idAutor}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: const Color.fromARGB(255, 224, 223, 223),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 20),
-                      SizedBox(width: 4),
-                      Text('4.5',
-                          style: TextStyle(
-                              fontSize: 16, color: Colors.blue.shade200)),
-                      SizedBox(width: 20),
-                      Icon(
-                        Icons.book,
-                        color: const Color.fromARGB(255, 255, 255, 255),
-                        size: 20,
-                      ),
-                      SizedBox(width: 4),
-                      Text('${book.numPaginas} páginas',
-                          style: TextStyle(
-                              fontSize: 16, color: Colors.blue.shade200)),
-                    ],
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    'Sinopsis',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    book.sinopsis,
-                    style: TextStyle(
-                        fontSize: 16, height: 1.5, color: Colors.white),
-                  ),
-                  SizedBox(height: 30),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            double _userRating = 0;
+            final _reviewController = TextEditingController();
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BookReaderView(
-                              bookName: book.titulo,
+            return FractionallySizedBox(
+              heightFactor:
+                  0.9, 
+              child: Container(
+                padding: EdgeInsets.all(20),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Center(
+                        child: Container(
+                          height: 250,
+                          width: 180,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: DecorationImage(
+                              image: NetworkImage(book.urlPortada),
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[800],
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12))),
-                      child: Text(
-                        "Empezar a leer",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 20),
+                      Text(book.titulo,
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      SizedBox(height: 8),
+                      Text('Autor ID: ${book.idAutor}',
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Color.fromARGB(255, 224, 223, 223))),
+                      SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Icon(Icons.star, color: Colors.amber, size: 20),
+                          SizedBox(width: 4),
+                          Text('4.5',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.blue.shade200)),
+                          SizedBox(width: 20),
+                          Icon(Icons.book, color: Colors.white, size: 20),
+                          SizedBox(width: 4),
+                          Text('${book.numPaginas} páginas',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.blue.shade200)),
+                        ],
+                      ),
+                      SizedBox(height: 24),
+                      Text('Sinopsis',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white)),
+                      SizedBox(height: 8),
+                      Text(book.sinopsis,
+                          style: TextStyle(
+                              fontSize: 16, height: 1.5, color: Colors.white)),
+
+                      SizedBox(height: 30),
+                      Divider(color: Colors.blue[400], thickness: 1),
+                      SizedBox(height: 20),
+
+                      Text('Deja tu calificación',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white)),
+                      SizedBox(height: 10),
+
+                      _buildRatingStars(_userRating, (rating) {
+                        setModalState(() {
+                          _userRating = rating;
+                        });
+                      }),
+                      SizedBox(height: 20),
+
+                      TextField(
+                        controller: _reviewController,
+                        maxLines: 3,
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: 'Escribe tu reseña aquí...',
+                          hintStyle: TextStyle(color: Colors.white70),
+                          filled: true,
+                          fillColor: Colors.blue[700],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_userRating > 0) {
+                              print(
+                                  'Calificación: $_userRating, Comentario: ${_reviewController.text}');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('¡Gracias por tu reseña!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              setModalState(() {
+                                _userRating = 0;
+                                _reviewController.clear();
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Por favor, selecciona una calificación.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                          child: Text('Enviar Reseña'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 30),
+                      Text('Lo que otros dicen (${_mockReviews.length})',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white)),
+                      SizedBox(height: 16),
+
+                      // Lista de reseñas existentes
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: _mockReviews.length,
+                        itemBuilder: (context, index) {
+                          return _buildReviewTile(_mockReviews[index]);
+                        },
+                      ),
+
+                      SizedBox(height: 30),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('session_fecha_inicio',
+                                DateTime.now().toIso8601String());
+                            if (!context.mounted) return;
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BookReaderView(
+                                    bookName: book.titulo, bookId: book.id),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[800],
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 50, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12))),
+                          child: Text("Empezar a leer",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16)),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
+    );
+  }
+
+  Widget _buildRatingStars(double currentRating, Function(double) onRated) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (index) {
+        return IconButton(
+          onPressed: () {
+            onRated(index + 1.0);
+          },
+          icon: Icon(
+            index < currentRating ? Icons.star : Icons.star_border,
+            color: Colors.amber,
+            size: 35,
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildReviewTile(Review review) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.blue[700],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(review.avatarUrl),
+                radius: 20,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      review.userName,
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      children: List.generate(
+                          5,
+                          (index) => Icon(
+                                index < review.rating
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                color: Colors.amber,
+                                size: 16,
+                              )),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            review.comment,
+            style: TextStyle(color: Colors.white.withOpacity(0.9), height: 1.4),
+          ),
+        ],
+      ),
     );
   }
 

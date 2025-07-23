@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:read_up/navigation/navigation_controller.dart';
-import 'package:read_up/navigation/navigation_menu.dart';
 import 'package:read_up/provider/registration_provider.dart';
-import 'package:read_up/screens/homePages/home_screen.dart';
-import 'package:read_up/screens/singIn/register_screen.dart';
-import 'package:read_up/screens/singIn/sign_in_screen.dart';
+import 'package:read_up/features/auth/screens/sign_in_screen.dart';
 import 'package:read_up/widgets/button_quiz.dart';
 import 'package:read_up/services/auth_service.dart';
 

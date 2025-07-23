@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:read_up/models/user.dart';
 import 'package:read_up/navigation/navigation_menu.dart';
 import 'package:read_up/provider/session_provider.dart';
-import 'package:read_up/screens/singIn/welcome_screen.dart';
+import 'package:read_up/features/auth/screens/welcome_screen.dart';
 import 'package:read_up/services/auth_service.dart';
 import 'package:read_up/services/profile_service.dart';
 

@@ -1,11 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:read_up/models/racha.dart';
 import 'package:read_up/models/user.dart';
 import 'package:read_up/provider/session_provider.dart';
+import 'package:read_up/services/auth_service.dart';
+import 'package:read_up/services/racha_service.dart';
 import 'package:read_up/widgets/custom_tile.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final AuthService _authService = AuthService();
+  final RachaService _rachaService = RachaService();
+  late Future<Racha> _rachaFuture;
+
+  Future<Racha> _getRacha() async {
+    try {
+      final String? token = await _authService.getToken();
+      if (token == null) {
+        throw Exception("No se encontró el token de autenticación.");
+      }
+      return _rachaService.getRacha(token);
+    } catch (error) {
+      throw Exception("No se pudo cargar la racha: $error");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _rachaFuture = _getRacha();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +57,7 @@ class ProfileScreen extends StatelessWidget {
       );
     }
 
-    return SingleChildScrollView(
+     return SingleChildScrollView(
       child: Column(
         children: [
           SizedBox(
@@ -103,6 +133,7 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
+                // --- Tile de Información Personal (sin cambios) ---
                 CustomExpansionTile(
                   icon: Icons.person_outline,
                   color: Colors.blueAccent,
@@ -118,6 +149,28 @@ class ProfileScreen extends StatelessWidget {
                   color: Colors.green,
                   title: "Estadísticas de Lectura",
                   children: [
+                    // --- AQUÍ VA LA MAGIA ---
+                    FutureBuilder<Racha>(
+                      future: _rachaFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return _buildInfoRow("Racha", "Cargando...");
+                        }
+                        if (snapshot.hasError) {
+                          return _buildInfoRow("Racha", "No disponible");
+                        }
+                        if (snapshot.hasData) {
+                          final racha = snapshot.data!;
+                          return _buildInfoRow(
+                            "Racha actual",
+                            "${racha.diasConsecutivos} días 🔥",
+                            isHighlight: true,
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    const Divider(indent: 15, endIndent: 15),
                     _buildInfoRow("Rango", user.rango!, isHighlight: true),
                     const Divider(indent: 15, endIndent: 15),
                     _buildGenresSection(user.generoFavoritos!),

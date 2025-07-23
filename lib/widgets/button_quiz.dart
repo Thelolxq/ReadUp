@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:read_up/screens/quiz/edad_encuesta_screen.dart';
+import 'package:read_up/features/quiz/screens/edad_encuesta_screen.dart';
 
 class ButtonQuiz extends StatelessWidget {
   final bool isEnable;
