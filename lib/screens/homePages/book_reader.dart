@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:read_up/models/quizzes.dart';
+import 'package:read_up/screens/homePages/quizz_view.dart';
 import 'package:read_up/services/auth_service.dart';
 import 'package:read_up/services/quizzes_service.dart';
 import 'package:read_up/services/session_service.dart';
@@ -214,52 +216,78 @@ class _BookReaderViewState extends State<BookReaderView> {
     }
   }
 
-  void _generateQuizz(int currentPageIndex) async {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text("Generando quiz"),
-      duration: Duration(seconds: 5),
-    ));
+ Future<GenerateQuizResponse> _generateQuizz(int currentPageIndex) async {
+  try {
+    final token = await _authService.getToken();
+    final idLibro = widget.bookId;
 
-    try {
-      final token = await _authService.getToken();
-      final prefs = await SharedPreferences.getInstance();
-      final idLibro = widget.bookId;
+    if (token == null || _bookS3Path == null) {
+      throw Exception("Faltan datos para el quiz (token o path).");
+    }
 
-      if (token == null || _bookS3Path == null) {
-        throw Exception("Faltan datos para el quiz (token, idLibro o path).");
-      }
+    final int paginaActual = currentPageIndex + 1;
 
-      final int paginaActual = currentPageIndex + 1;
+    final GenerateQuizResponse response = await _quizzesService.generateQuizz(
+        token, paginaActual, idLibro, _bookS3Path!);
 
-      final Map<String, dynamic> response = await _quizzesService.generateQuizz(
-          token, paginaActual, idLibro, _bookS3Path!);
+    return response;
+  } catch (error) {
+    print("Ocurrió un error en _generateQuizz: $error");
+    rethrow;
+  }
+}
 
-      final String succesMessage = response['mensaje'];
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(succesMessage), backgroundColor: Colors.green),
+ void _triggerQuiz(int currentPageIndex) async {
+    // Muestra un diálogo de carga para que el usuario sepa que algo está pasando
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Generando tu quiz..."),
+              ],
+            ),
+          ),
         );
-      }
-    } catch (error) {
-      print("Ocurrió un error en _generateQuizz: $error");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text("Error al generar el quiz: $error"),
-              backgroundColor: Colors.red),
-        );
-      }
-      rethrow;
+      },
+    );
+
+   try {
+    final GenerateQuizResponse response = await _generateQuizz(currentPageIndex);
+    
+    final int quizId = response.quizId;
+
+    if (mounted) {
+      Navigator.of(context).pop(); 
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.mensaje), backgroundColor: Colors.green),
+      );
+      
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => QuizView(quizId: quizId),
+      ));
+    }
+  } catch (e) {
+    if (mounted) {
+      Navigator.of(context).pop(); 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error al crear el quiz: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
 
-  void _triggerQuiz(int currentPageIndex) async {
-    try {
-      _generateQuizz(currentPageIndex);
-    } catch (e) {
-      print("El trigger del quiz recibió una excepción: $e");
-    }
-  }
 
   Future<bool> _onWillPop() async {
     final int duration = await _calculateReadingDurationInSeconds();
