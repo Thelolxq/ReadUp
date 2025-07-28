@@ -8,6 +8,7 @@ import 'package:read_up/services/auth_service.dart';
 import 'package:read_up/services/book_service.dart';
 import 'package:read_up/services/generos_service.dart';
 import 'package:read_up/services/profile_service.dart';
+import 'package:read_up/services/recomendaciones_service.dart';
 import 'package:read_up/services/review_services.dart';
 import 'package:read_up/services/search_service.dart';
 import 'package:read_up/widgets/carousel_books.dart';
@@ -33,8 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final ReviewServices _reviewServices = ReviewServices();
   final SearchService _searchService = SearchService();
   final ProfileService _profileService = ProfileService();
+  final RecomendacionesService _recomendacionesService =
+      RecomendacionesService();
 
-  List<Book>? _popularBooks;
+  List<Book>? _recommendedBooks;
   List<Review>? _reviews;
   List<Generos>? _generos;
   bool _isInitialLoading = true;
@@ -69,34 +72,47 @@ class _HomeScreenState extends State<HomeScreen> {
     return _userFuturesCache[userId]!;
   }
 
-  Future<void> _loadInitialData() async {
-    if (_isInitialLoading && mounted) {
+   Future<void> _loadInitialData() async {
+    if (mounted) {
       setState(() {
         _isInitialLoading = true;
         _hasError = false;
       });
     }
     try {
+      print("Iniciando carga de datos...");
+      final token = await _authService.getToken();
+      if (token == null) throw Exception("Usuario no autenticado");
+      _token = token;
+      print("Token obtenido con éxito.");
+
+      final currentUser = await _profileService.getProfileWithToken(_token);
+      print("Perfil de usuario obtenido, ID: ${currentUser.id}");
+      
+      if (currentUser.id == null) throw Exception("No se pudo obtener el ID del usuario");
+      
       await Future.wait([
         _getGeneros(),
-        _getBooks(),
+        _getRecommendedBooks(currentUser.id!),
         _getReviews(),
       ]);
+      print("Todas las peticiones (géneros, recomendaciones, reseñas) se completaron.");
+
       if (mounted) {
         setState(() {
           _isInitialLoading = false;
         });
       }
     } catch (error) {
-      print(
-          "Ocurrió un error al cargar los datos iniciales: ${error.toString()}");
+      // Este print es CLAVE para saber por qué falla
+      print("🚨 OCURRIÓ UN ERROR en _loadInitialData: ${error.toString()}");
       if (mounted) {
-            setState(() {
-              _isInitialLoading = false;
-              _hasError = true;
-            });
+        setState(() {
+          _isInitialLoading = false;
+          _hasError = true;
+        });
       }
-    } 
+    }
   }
 
   Future<void> _getGeneros() async {
@@ -112,12 +128,15 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() => _reviews = reviews);
   }
 
-  Future<void> _getBooks() async {
-    final String? token = await _authService.getToken();
-    final books = await _bookService.getLibros(token);
-    if (mounted) setState(() => _popularBooks = books);
+  Future<void> _getRecommendedBooks(int idUser) async {
+    if (_token == null) return;
+    print("Obteniendo recomendaciones para el usuario ID: $idUser");
+    final books = await _recomendacionesService.getRecomendacion(_token!, idUser);
+    print("Recomendaciones obtenidas: ${books.recomendaciones?.length} libros.");
+    if (mounted) {
+      setState(() => _recommendedBooks = books.recomendaciones);
+    }
   }
-
   Future<void> _performSearch(String query) async {
     if (query.trim().isEmpty) return;
     FocusScope.of(context).unfocus();
@@ -181,29 +200,56 @@ class _HomeScreenState extends State<HomeScreen> {
                 final String? token = await _authService.getToken();
                 if (token == null) throw Exception("Token no encontrado");
 
-                await _reviewServices.postReview(
+                final ApiResponseReview response =
+                    await _reviewServices.postReview(
                   token,
                   book.id,
                   _reviewController.text,
                   _userRating,
                 );
 
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    backgroundColor: Colors.green,
-                    content: Text("¡Reseña publicada con éxito!")));
+                if (!mounted) return;
+
+                if (response.evento != null) {
+                  final logroDesbloqueado = response.evento!.detalle;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: Colors.amber[800],
+                    content: Row(
+                      children: [
+                        const Icon(Icons.emoji_events, color: Colors.white),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            "¡Logro Desbloqueado: ${logroDesbloqueado.descripcion}!",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      backgroundColor: Colors.green,
+                      content: Text("¡Reseña publicada con éxito!")));
+                }
 
                 _reviewController.clear();
                 setModalState(() {
                   _userRating = 0;
                 });
               } catch (error) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    backgroundColor: Colors.red,
-                    content: Text("Error al publicar: ${error.toString()}")));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      backgroundColor: Colors.red,
+                      content: Text("Error al publicar: $error")));
+                }
               } finally {
-                setModalState(() {
-                  _isSubmitting = false;
-                });
+                Navigator.pop(context);
+                if (mounted) {
+                  setModalState(() {
+                    _isSubmitting = false;
+                  });
+                }
               }
             }
 
@@ -395,13 +441,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   fillColor: Colors.blue[600],
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(style: BorderStyle.none, width: 0)),
-                  disabledBorder:OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(style: BorderStyle.none, width: 0)),
+                  disabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(style: BorderStyle.none, width: 0)), 
+                      borderSide:
+                          const BorderSide(style: BorderStyle.none, width: 0)),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(style: BorderStyle.none, width: 0)),
+                      borderSide:
+                          const BorderSide(style: BorderStyle.none, width: 0)),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.close, color: Colors.white),
@@ -492,6 +541,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             color: const Color.fromARGB(255, 249, 252, 255),
             width: size.width,
+            height: size.height,
             child: Column(
               children: [
                 const Padding(
@@ -499,30 +549,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Populares",
+                      Text("Recomendados",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 20,
                               fontWeight: FontWeight.w900)),
-                      Icon(Icons.add_chart_rounded, size: 24),
+                      Icon(Icons.auto_awesome, size: 24),
                     ],
                   ),
                 ),
                 _buildPopularBooksSection(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 40, left: 30, right: 20),
+               const Padding(
+                  padding: EdgeInsets.only(top: 40, left: 30, right: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Reseñas Recientes",
+                      Text("Reseñas Recientes",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 20,
                               fontWeight: FontWeight.w900)),
-                      IconButton(
-                          onPressed: () {},
-                          icon:
-                              const Icon(Icons.rate_review_outlined, size: 24)),
+                        Icon(Icons.rate_review_outlined, color: Colors.black, size: 24),
                     ],
                   ),
                 ),
@@ -536,12 +583,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPopularBooksSection() {
-    if (_popularBooks == null || _popularBooks!.isEmpty) {
+    if (_recommendedBooks == null || _recommendedBooks!.isEmpty) {
       return const Center(
           heightFactor: 5, child: Text("No hay libros disponibles."));
     }
     return CarouselBooks(
-      books: _popularBooks!,
+      books: _recommendedBooks!,
       onTap: (bookTocado) {
         _showBookDetailsModal(context, bookTocado);
       },
@@ -569,12 +616,7 @@ class _HomeScreenState extends State<HomeScreen> {
             future: _getUserFuture(review.usuarioId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Card(
-                  child: ListTile(
-                    leading: CircularProgressIndicator(),
-                    title: Text("Cargando usuario..."),
-                  ),
-                );
+                return Center(child: CircularProgressIndicator(),);
               }
 
               if (snapshot.hasError) {

@@ -18,7 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nombreController = TextEditingController();
   final _correoController = TextEditingController();
   final _contrasenaController = TextEditingController();
-
+  bool _isPasswordVisible = false;
   @override
   void dispose() {
     _nombreController.dispose();
@@ -150,6 +150,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           SizedBox(height: 20),
           TexfieldformPerso(
+            isPasswordVisible: !_isPasswordVisible ,
+            enableSuggestions: false,
+            iconButon: IconButton(onPressed: (){
+              setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              });
+            }, icon:Icon( _isPasswordVisible ? Icons.visibility : Icons.visibility_off)),
             controller: _contrasenaController,
             validator: (value) {
               if (value == null || value.length < 6) {

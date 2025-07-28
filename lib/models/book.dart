@@ -1,5 +1,18 @@
 import 'dart:convert';
 
+
+
+class Recomendacion{
+  final List<Book>? recomendaciones;
+
+
+  Recomendacion({required this.recomendaciones});
+
+  factory Recomendacion.fromJson(Map<String, dynamic> json) => Recomendacion(
+    recomendaciones: List<Book>.from(json['recomendaciones'].map((x)=> Book.fromJson(x)))
+  );
+}
+
 class Book {
   final int idAutor;
   final String titulo;

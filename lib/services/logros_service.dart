@@ -29,4 +29,28 @@ class LogrosService {
 
     }
   }
+
+  Future<ApiResponseLogrosObtenidos> getAllLogros (String? token) async {
+      final url = Uri.parse('$_baseUrl/logro');
+
+      try{
+        final response = await http.get(
+          url,
+          headers: {
+             'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization' : 'Bearer $token'
+          }
+        );
+
+        if(response.statusCode == 200){
+          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+          return ApiResponseLogrosObtenidos.fromJson(jsonResponse);
+        }else{
+          throw Exception("Fallo en el servidor; body: ${response.body}");
+        }
+      }catch(error){ 
+        throw Exception("Error en la conexion, verifica tu conexion: $error");
+
+      }
+  }
 }

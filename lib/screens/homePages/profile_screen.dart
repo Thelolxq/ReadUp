@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:read_up/models/logros.dart';
@@ -35,6 +37,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     }
   }
+
+
 
   Future<Racha> _getRacha() async {
     try {
@@ -153,14 +157,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                // --- Tile de Información Personal (sin cambios) ---
                 CustomExpansionTile(
                   icon: Icons.person_outline,
                   color: Colors.blueAccent,
                   title: "Información Personal",
                   children: [
-                    _buildInfoRow("Correo", user.correo!),
-                    _buildInfoRow("Miembro desde", "2023-01-15"),
+                    _buildInfoRow("Correo", "${user.correo}", isHighlight: true),
+                    _buildInfoRow("Edad", "${user.edad}", isHighlight: true),
+                    _buildInfoRow("Genero sexual", "${user.generoSexual}", isHighlight: true),
+                    _buildInfoRow("Paginas diarias", "${user.paginasDiarias}", isHighlight: true),
+                    _buildInfoRow("Objetivos lector", "${user.objetivoLector}", isHighlight: true),
+                    _buildInfoRow("Objetivos semanal", "${user.objetivoSemanal}", isHighlight: true),
                   ],
                 ),
                 const SizedBox(height: 15),
@@ -206,9 +213,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           return Column(
                             children: [
-                              _buildInfoRow("Puntos totales", "${logros.puntosTotales}"),
-                              _buildInfoRow("logros obtenidos", "${logros.cantidadLogros}"),
+                              _buildInfoRow("Puntos totales", "${logros.puntosTotales}", isHighlight: true),
+                              _buildInfoRow("Logros obtenidos", "${logros.cantidadLogros}", isHighlight: true),
+                              _buildInfoRow("Nivel letor", "${user.nivelLector}", isHighlight: true),
                               _buildInfoRow("Rango", logros.nombreRango, isHighlight: true),
+                              _builLogrosObtenidos(logros.logros)
 
                             ],
                           );
@@ -285,29 +294,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildAchievesSection(List<String> logros){
-    return Padding(padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+  Widget _builLogrosObtenidos(List<LogroObtenido> logros) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Logros",
+            "Últimos Logros Obtenidos",
             style: TextStyle(
               color: Colors.grey[700],
               fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height:10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            children: logros
-              .map((logros)=> Chip(label: Text(logros))).toList()
-          )
+          const SizedBox(height: 10),
+          if (logros.isEmpty)
+             Padding(
+               padding: const EdgeInsets.only(top: 8.0),
+               child: Text(
+                  "Aún no has desbloqueado ningún logro.",
+                  style: TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.italic),
+                ),
+             )
+          else
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 6.0,
+              children: logros.map((logro) => Chip(
+                        label: Text(
+                          logro.nombreLogro, 
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w500),
+                        ),
+                        // Añadimos un icono para que se vea mejor
+                        avatar: const Icon(Icons.emoji_events, color: Colors.white, size: 16),
+                        backgroundColor: const Color.fromARGB(255, 76, 94, 175),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                      ))
+                  .toList(),
+            ),
         ],
       ),
     );
   }
+
+ 
 
   Widget _buildGenresSection(List<String> genres) {
     return Padding(

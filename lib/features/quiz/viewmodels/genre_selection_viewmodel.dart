@@ -4,9 +4,9 @@ import 'package:read_up/provider/registration_provider.dart';
 
 class GenreSelectionViewModel extends ChangeNotifier {
   static const List<String> _availableGenres = [
-    'Fantasía', 'Ciencia ficción', 'Romance', 'Misterio', 'Terror',
-    'Aventura', 'Drama', 'Histórico', 'Biografía', 'Poesía',
-    'Autoayuda', 'Comedia',
+    'Clasico', 'Educativo', 'Humor',
+    'Aventura','Historia', 
+   
   ];
 
   final List<String> _selectedGenres = [];

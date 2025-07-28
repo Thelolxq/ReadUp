@@ -18,10 +18,9 @@ class CustomExpansionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
        decoration: BoxDecoration(
-        
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-         border: Border(bottom: BorderSide(color: Colors.grey, width: 0.2))
+         border: Border.all(color: Colors.grey.shade200,)
       ),
       child: ExpansionTile(
         onExpansionChanged: (isExpanding) {
@@ -29,6 +28,7 @@ class CustomExpansionTile extends StatelessWidget {
             HapticFeedback.lightImpact();
           }
         },
+        
         leading: Icon(icon, color: color),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
         shape: const Border(),

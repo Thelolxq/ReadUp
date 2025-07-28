@@ -18,6 +18,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final _correoController = TextEditingController();
   final _contrasenaController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
@@ -29,12 +30,6 @@ class _SignInScreenState extends State<SignInScreen> {
   Future<void> _signIn() async {
     final viewModel = context.read<SignInViewModel>();
     final sessionProvider = context.read<SessionProvider>();
-
-    if (kDeveloperMode) {
-      viewModel.signInAsDeveloper(sessionProvider);
-      _navigateHome();
-      return;
-    }
 
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
@@ -144,6 +139,14 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
           const SizedBox(height: 20),
           TexfieldformPerso(
+            isPasswordVisible: !_isPasswordVisible ,
+            enableSuggestions: false,
+            iconButon: IconButton(icon: Icon( _isPasswordVisible ? Icons.visibility : Icons.visibility_off, size: 20,) , 
+            onPressed: (){
+              setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              });
+            }),
             controller: _contrasenaController,
             validator: (value) => (value == null || value.isEmpty) ? 'Por favor, ingresa una contraseña' : null,
             hinText: "Password",

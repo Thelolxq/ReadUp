@@ -14,8 +14,14 @@ class ObjetivosScreen extends StatefulWidget {
 }
 
 class _ObjetivosScreenState extends State<ObjetivosScreen> {
+
+  bool _isLoading = false;
+
   void _goToNextScreen() async {
     FocusScope.of(context).unfocus();
+    setState(() {
+      _isLoading = true;
+    });
     final registrationProvider = context.read<RegistrationProvider>();
     registrationProvider.updateObjetivos(_objetivoLectorSeleccionado!,
         _objetivoSemanalSeleccionado!, int.parse(_paginasPorDia));
@@ -59,6 +65,12 @@ class _ObjetivosScreenState extends State<ObjetivosScreen> {
               .replaceAll('Exception: ', '')), // Muestra el mensaje de error
           backgroundColor: Colors.red,
         ));
+      }
+    }finally{
+      if(mounted){
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -133,70 +145,73 @@ class _ObjetivosScreenState extends State<ObjetivosScreen> {
         backgroundColor: Colors.white,
       ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              width: size.width,
-              height: size.height / 1.2401,
-              padding: const EdgeInsets.all(20),
-              child: SingleChildScrollView(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "¿Cuál es tu objetivo como lector?",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    textAlign: TextAlign.start,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildSeleccion(
-                    "Objetivo lector",
-                    _objetivosLectores,
-                    _objetivoLectorSeleccionado,
-                    (val) => setState(() => _objetivoLectorSeleccionado = val),
-                  ),
-                  const SizedBox(height: 30),
-                  _buildSeleccion(
-                    "Objetivo semanal",
-                    _objetivosSemanales,
-                    _objetivoSemanalSeleccionado,
-                    (val) => setState(() => _objetivoSemanalSeleccionado = val),
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    "¿Cuántas páginas deseas leer al día?",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    keyboardType: TextInputType.number,
-                    onChanged: (val) => setState(() => _paginasPorDia = val),
-                    decoration: InputDecoration(
-                      hintText: 'Ej. 10',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: size.width,
+                height: size.height / 1.2401,
+                padding: const EdgeInsets.all(20),
+                child: SingleChildScrollView(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "¿Cuál es tu objetivo como lector?",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.start,
                     ),
+                    const SizedBox(height: 20),
+                    _buildSeleccion(
+                      "Objetivo lector",
+                      _objetivosLectores,
+                      _objetivoLectorSeleccionado,
+                      (val) => setState(() => _objetivoLectorSeleccionado = val),
+                    ),
+                    const SizedBox(height: 30),
+                    _buildSeleccion(
+                      "Objetivo semanal",
+                      _objetivosSemanales,
+                      _objetivoSemanalSeleccionado,
+                      (val) => setState(() => _objetivoSemanalSeleccionado = val),
+                    ),
+                    const SizedBox(height: 30),
+                    const Text(
+                      "¿Cuántas páginas deseas leer al día?",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (val) => setState(() => _paginasPorDia = val),
+                      decoration: InputDecoration(
+                        hintText: 'Ej. 10',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
+                  ],
+                )),
+              ),
+              SizedBox(
+                width: size.width,
+                height: 70,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ButtonQuiz(
+                    isLoading: _isLoading,
+                    onPressed: _goToNextScreen,
+                    isEnable: _puedeContinuar,
                   ),
-                ],
-              )),
-            ),
-            SizedBox(
-              width: size.width,
-              height: 70,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ButtonQuiz(
-                  onPressed: _goToNextScreen,
-                  isEnable: _puedeContinuar,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

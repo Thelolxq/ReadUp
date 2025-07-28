@@ -44,8 +44,8 @@ class User {
     }
     
     List<String>? historialList;
-    if(json['historialBusqueda'] != null){
-      historialList = List<String>.from(json['historialBusqueda']);
+    if(json['historialBusquedas'] != null){
+      historialList = List<String>.from(json['historialBusquedas']);
     }
     return User(
     nombreUsuario: json['nombreUsuario'], 

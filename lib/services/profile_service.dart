@@ -8,7 +8,7 @@ class ProfileService {
 
 
 
-  Future<User> getProfileWithToken(String token) async {
+  Future<User> getProfileWithToken(String? token) async {
     
     if(token == null || token.isEmpty){
       throw Exception("El token de autenticacion no se ha encontrado");

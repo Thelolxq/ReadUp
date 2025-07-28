@@ -45,7 +45,7 @@ class _NivelLectorScreenState extends State<NivelLectorScreen> {
 
   String? _nivelSeleccionado;
 
-  final List<String> _niveles = ['avanzado', 'intermedio', 'principiante'];
+  final List<String> _niveles = ['principiante', 'intermedio', 'avanzado'];
 
   @override
   Widget build(BuildContext context) {

@@ -20,6 +20,24 @@ class ApiResponseLogros{
 }
 
 
+class LogroObtenido{
+  final int idUsuario;
+  final int idLogro;
+  final String nombreLogro;
+  final DateTime fechaObtenido;
+
+
+  LogroObtenido({required this.idUsuario, required this.idLogro, required this.nombreLogro, required this.fechaObtenido});
+
+  factory LogroObtenido.fromJson(Map<String, dynamic> json) => LogroObtenido(
+    idUsuario: json['idUsuario'], 
+    idLogro: json['idLogro'], 
+    nombreLogro: json['nombreLogro'], 
+    fechaObtenido: DateTime.parse(json['fechaObtenido'])
+    );
+}
+
+
 
 class Logros {
 
@@ -28,7 +46,7 @@ class Logros {
   final int idRango;
   final String nombreRango;
   final int cantidadLogros;
-  final List logros;
+  final List<LogroObtenido> logros;
 
 
 
@@ -41,7 +59,7 @@ class Logros {
     idRango: json['idRango'], 
     nombreRango: json['nombreRango'],
     cantidadLogros: json['cantidadLogros'], 
-    logros: json['logros']
+    logros: List<LogroObtenido>.from(json['logros'].map((x) => LogroObtenido.fromJson(x)))
     );
 
 
@@ -54,6 +72,8 @@ class Logros {
       'logros' : logros
     };
 }
+Logros logroFromJson(String str) => Logros.fromJson(json.decode(str));
+
 
 class LogrosDisponibles{
   final int id;
@@ -66,22 +86,44 @@ class LogrosDisponibles{
 
 
   factory LogrosDisponibles.fromJson(Map<String, dynamic> json) => LogrosDisponibles(
-    id: json['id'], 
-    nombre: json['nombre'], 
+    id: json['id']['value'], 
+    nombre: json['nombre']['value'], 
     descripcion: json['descripcion'], 
-    puntosOtorgados: json['puntosOtorgados'], 
+    puntosOtorgados: json['puntosOtorgados']['value'], 
     tipo: json['tipo']
     );
 
 
     Map<String, dynamic> toJson() => {
-      'id' : id,
-      'nombre' : nombre,
+      'id' : {'value',id},
+      'nombre' :{'value', nombre},
       'descripcion' : descripcion,
-      'puntosOtorgados' : puntosOtorgados,
+      'puntosOtorgados' : {'value', puntosOtorgados},
       'tipo' : tipo
     };
 }
 
 
-Logros logroFromJson(String str) => Logros.fromJson(json.decode(str));
+class ApiResponseLogrosObtenidos{
+  final List<LogrosDisponibles> data;
+  final bool success;
+
+
+  ApiResponseLogrosObtenidos({required this.data, required this.success});
+
+
+  factory ApiResponseLogrosObtenidos.fromJson(Map<String, dynamic> json) => ApiResponseLogrosObtenidos(
+    data: List<LogrosDisponibles>.from(json['data'].map((x) => LogrosDisponibles.fromJson(x))), 
+    success: json['success'] 
+    );
+
+
+    Map<String, dynamic> toJson () => {
+      'data' : List<dynamic>.from(data.map((x)=> x.toJson())),
+      'success' : success
+    };
+}
+
+
+
+

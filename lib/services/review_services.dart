@@ -39,7 +39,7 @@ class ReviewServices {
   }
 
 
-  Future<void> postReview (String token, int libroId, String comentario, int calificaion) async {
+  Future<ApiResponseReview> postReview (String token, int libroId, String comentario, int calificaion) async {
     final url = Uri.parse('$_base/resenas');
 
     try{
@@ -58,12 +58,13 @@ class ReviewServices {
 
       if(response.statusCode == 201){
         final responseData = jsonDecode(response.body);
+        final ApiResponseReview responseReview = ApiResponseReview.fromJson(responseData);
+        return responseReview;
       }else{
-      throw Exception("Error en el servidor: Body: ${response.body}");
-
+      throw Exception("Error en la peticion; ${response.body}");
       }
     }catch(error){
-      throw Exception("Error en el servidor: $error");
+      throw Exception("Error en el servidor, verifica tu conexion");
     }
   }
 

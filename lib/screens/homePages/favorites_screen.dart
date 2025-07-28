@@ -94,6 +94,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 );
 
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    backgroundColor: Colors.green,
                     content: Text("¡Reseña publicada con éxito!")));
 
                 _reviewController.clear();
@@ -102,6 +103,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 });
               } catch (error) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: Colors.red,
                     content: Text("Error al publicar: ${error.toString()}")));
               } finally {
                 setModalState(() {
@@ -110,149 +112,150 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               }
             }
 
-            return FractionallySizedBox(
-              heightFactor: 0.9,
-              child: Container(
-                padding: EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Center(
-                          child: Container(
-                              height: 250,
-                              width: 180,
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: NetworkImage(book.urlPortada),
-                                      fit: BoxFit.cover),
-                                  borderRadius: BorderRadius.circular(10)))),
-                      SizedBox(height: 20),
-                      Text(book.titulo,
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      SizedBox(height: 8),
-                      Text('Autor ID: ${book.idAutor}',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Color.fromARGB(255, 224, 223, 223))),
-                      SizedBox(height: 16),
-                      Row(children: [
-                        Icon(Icons.star, color: Colors.amber, size: 20),
-                        SizedBox(width: 4),
-                        Text('4.5',
+            return Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: FractionallySizedBox(
+                heightFactor: 0.9,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Center(
+                            child: Container(
+                                height: 250,
+                                width: 180,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: NetworkImage(book.urlPortada),
+                                        fit: BoxFit.cover),
+                                    borderRadius: BorderRadius.circular(10)))),
+                        SizedBox(height: 20),
+                        Text(book.titulo,
                             style: TextStyle(
-                                fontSize: 16, color: Colors.blue.shade200)),
-                        SizedBox(width: 20),
-                        Icon(Icons.book, color: Colors.white, size: 20),
-                        SizedBox(width: 4),
-                        Text('${book.numPaginas} páginas',
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                        SizedBox(height: 8),
+                        Text('Autor ID: ${book.idAutor}',
                             style: TextStyle(
-                                fontSize: 16, color: Colors.blue.shade200))
-                      ]),
-                      SizedBox(height: 24),
-                      Text('Sinopsis',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white)),
-                      SizedBox(height: 8),
-                      Text(book.sinopsis,
-                          style: TextStyle(
-                              fontSize: 16, height: 1.5, color: Colors.white)),
-                      SizedBox(height: 30),
-                      Center(
-                          child: ElevatedButton(
-                              onPressed: () async {
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setString('session_fecha_inicio',
-                                    DateTime.now().toIso8601String());
-                                if (!context.mounted) return;
-                                Navigator.pop(context);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => BookReaderView(
-                                            bookName: book.titulo,
-                                            bookId: book.id)));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue[800],
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 50, vertical: 15),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12))),
-                              child: Text("Empezar a leer",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16)))),
-
-                      SizedBox(height: 30),
-                      Text('Publica tu reseña',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white)),
-                      SizedBox(height: 12),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(5, (index) {
-                          return IconButton(
-                            onPressed: () {
-                              setModalState(() {
-                                _userRating = index + 1;
-                              });
-                            },
-                            icon: Icon(
-                              index < _userRating
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              color: Colors.amber,
-                              size: 35,
-                            ),
-                          );
-                        }),
-                      ),
-                      SizedBox(height: 12),
-
-                      TextField(
-                        controller: _reviewController,
-                        style: TextStyle(color: Colors.white),
-                        maxLines: 4,
-                        decoration: InputDecoration(
-                          hintText: "Escribe tu opinión sobre el libro...",
-                          hintStyle: TextStyle(color: Colors.white54),
-                          filled: true,
-                          fillColor: Colors.black.withOpacity(0.1),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Botón para publicar
-                      Center(
-                        child: _isSubmitting
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : ElevatedButton(
-                                onPressed:
-                                    submitReview, // Llama a la lógica de publicación
+                                fontSize: 18,
+                                color: Color.fromARGB(255, 224, 223, 223))),
+                        SizedBox(height: 16),
+                        Row(children: [
+                          Icon(Icons.star, color: Colors.amber, size: 20),
+                          SizedBox(width: 4),
+                          Text('4.5',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.blue.shade200)),
+                          SizedBox(width: 20),
+                          Icon(Icons.book, color: Colors.white, size: 20),
+                          SizedBox(width: 4),
+                          Text('${book.numPaginas} páginas',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.blue.shade200))
+                        ]),
+                        SizedBox(height: 24),
+                        Text('Sinopsis',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white)),
+                        SizedBox(height: 8),
+                        Text(book.sinopsis,
+                            style: TextStyle(
+                                fontSize: 16,
+                                height: 1.5,
+                                color: Colors.white)),
+                        SizedBox(height: 30),
+                        Center(
+                            child: ElevatedButton(
+                                onPressed: () async {
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.setString('session_fecha_inicio',
+                                      DateTime.now().toIso8601String());
+                                  if (!context.mounted) return;
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => BookReaderView(
+                                              bookName: book.titulo,
+                                              bookId: book.id)));
+                                },
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.amber[700],
+                                    backgroundColor: Colors.blue[800],
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 40, vertical: 12)),
-                                child: Text("Publicar reseña",
+                                        horizontal: 50, vertical: 15),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12))),
+                                child: Text("Empezar a leer",
                                     style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold)),
+                                        color: Colors.white, fontSize: 16)))),
+                        SizedBox(height: 30),
+                        Text('Publica tu reseña',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white)),
+                        SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(5, (index) {
+                            return IconButton(
+                              onPressed: () {
+                                setModalState(() {
+                                  _userRating = index + 1;
+                                });
+                              },
+                              icon: Icon(
+                                index < _userRating
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                color: Colors.amber,
+                                size: 35,
                               ),
-                      ),
-                    ],
+                            );
+                          }),
+                        ),
+                        SizedBox(height: 12),
+                        TextField(
+                          controller: _reviewController,
+                          style: TextStyle(color: Colors.white),
+                          maxLines: 4,
+                          decoration: InputDecoration(
+                            hintText: "Escribe tu opinión sobre el libro...",
+                            hintStyle: TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.black.withOpacity(0.1),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none),
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Center(
+                          child: _isSubmitting
+                              ? CircularProgressIndicator(color: Colors.white)
+                              : ElevatedButton(
+                                  onPressed: submitReview,
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.amber[700],
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 40, vertical: 12)),
+                                  child: Text("Publicar reseña",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -262,6 +265,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

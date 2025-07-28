@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:read_up/models/user.dart';
 import 'package:read_up/provider/session_provider.dart';
 import 'package:read_up/services/auth_service.dart';
 import 'package:read_up/services/profile_service.dart';
@@ -41,7 +40,4 @@ class SignInViewModel extends ChangeNotifier {
     }
   }
 
-  void signInAsDeveloper(SessionProvider sessionProvider) {
-    sessionProvider.setUser(User(correo: "dev@gmail.com"));
-  }
 }

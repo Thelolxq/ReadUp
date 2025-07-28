@@ -27,7 +27,6 @@ class AuthService {
         print('El servidor respondió con un error.');
         print('Status Code: ${response.statusCode}');
         print('Cuerpo de la respuesta (raw): ${response.body}');
-
         try {
           final errorData = jsonDecode(response.body);
 

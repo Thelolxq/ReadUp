@@ -56,8 +56,10 @@ NavigationBar(
               NavigationDestination(
                   icon: Icon(Icons.all_inbox,  color: controller.selectedIndex == 1 ? Colors.white : Colors.black), label: 'Libros'),
               NavigationDestination(
-                  icon: Icon(Icons.history,  color: controller.selectedIndex == 2 ? Colors.white : Colors.black), label: 'Historial'),
-              NavigationDestination(icon: Icon(Icons.person,  color: controller.selectedIndex == 3 ? Colors.white : Colors.black), label: 'Profile'),
+                  icon: Icon(Icons.emoji_events,  color: controller.selectedIndex == 2? Colors.white : Colors.black), label: 'Logros'),
+              NavigationDestination(
+                  icon: Icon(Icons.history,  color: controller.selectedIndex == 3 ? Colors.white : Colors.black), label: 'Historial'),
+              NavigationDestination(icon: Icon(Icons.person,  color: controller.selectedIndex == 4 ? Colors.white : Colors.black), label: 'Profile'),
             ],
       ),
       backgroundColor: Colors.blue[800],
