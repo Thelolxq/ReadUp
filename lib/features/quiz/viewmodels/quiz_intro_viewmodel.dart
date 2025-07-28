@@ -12,7 +12,10 @@ class QuizIntroViewModel extends ChangeNotifier {
 
   QuizIntroState get currentState => _currentState;
 
-
+ void reset() {
+    _currentState = QuizIntroState.initial;
+    notifyListeners();
+  }
   void start() {
     Future.delayed(const Duration(seconds: 1), () {
       _currentState = QuizIntroState.showingHint;

@@ -39,4 +39,32 @@ class ProfileService {
     }
   }
 
+
+  Future<User> getUsersById(String? token, int idUser) async {
+     if(token == null || token.isEmpty){
+      throw Exception("El token de autenticacion no se ha encontrado");
+    }
+
+    final url = Uri.parse('$_baseUrl/perfil/$idUser');
+    try{
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type' : 'application/json; charset=UTF-8',
+          'Authorization' : 'Bearer $token'
+        },
+        
+      );
+      if(response.statusCode == 200){
+        return User.fromJson(jsonDecode(response.body));
+      }else{
+        throw Exception('Error al obtener el perfil (${response.statusCode} : ${response.body})');
+      }
+    }catch(error){
+      print('Error de conectividad en getProfile $error');
+      throw Exception('Fallo la conexion');
+    }
+    
+  }
+
 }

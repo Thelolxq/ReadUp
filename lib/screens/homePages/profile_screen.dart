@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:read_up/models/logros.dart';
 import 'package:read_up/models/racha.dart';
 import 'package:read_up/models/user.dart';
 import 'package:read_up/provider/session_provider.dart';
 import 'package:read_up/services/auth_service.dart';
+import 'package:read_up/services/logros_service.dart';
 import 'package:read_up/services/racha_service.dart';
 import 'package:read_up/widgets/custom_tile.dart';
 
@@ -17,7 +19,22 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService _authService = AuthService();
   final RachaService _rachaService = RachaService();
+  final LogrosService _logrosService = LogrosService();
   late Future<Racha> _rachaFuture;
+  late Future<ApiResponseLogros> _logros;
+
+
+
+  Future<ApiResponseLogros> _getLogros() async{
+    try{
+      final String? token = await _authService.getToken();
+
+      return _logrosService.getLogros(token);
+    }catch(error){
+      throw Exception("Error en la peticion: $error");
+
+    }
+  }
 
   Future<Racha> _getRacha() async {
     try {
@@ -31,10 +48,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+
+
   @override
   void initState() {
     super.initState();
     _rachaFuture = _getRacha();
+    _logros = _getLogros();
   }
 
   @override
@@ -149,7 +169,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.green,
                   title: "Estadísticas de Lectura",
                   children: [
-                    // --- AQUÍ VA LA MAGIA ---
                     FutureBuilder<Racha>(
                       future: _rachaFuture,
                       builder: (context, snapshot) {
@@ -171,7 +190,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                     const Divider(indent: 15, endIndent: 15),
-                    _buildInfoRow("Rango", user.rango!, isHighlight: true),
+
+                    FutureBuilder<ApiResponseLogros>(future: _logros, builder: (context, snapshot){
+                        if(snapshot.connectionState == ConnectionState.waiting){
+                          return const Padding(
+                            padding:EdgeInsets.all(10),
+                            child: Center(child: CircularProgressIndicator(),), );
+                        }
+                        if(snapshot.hasError){
+                          return _buildInfoRow("Logros", "No disponibles");
+                        }
+
+                        if(snapshot.hasData){
+                          final logros = snapshot.data!.data;
+
+                          return Column(
+                            children: [
+                              _buildInfoRow("Puntos totales", "${logros.puntosTotales}"),
+                              _buildInfoRow("logros obtenidos", "${logros.cantidadLogros}"),
+                              _buildInfoRow("Rango", logros.nombreRango, isHighlight: true),
+
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                    }),
                     const Divider(indent: 15, endIndent: 15),
                     _buildGenresSection(user.generoFavoritos!),
                   ],
@@ -237,6 +280,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAchievesSection(List<String> logros){
+    return Padding(padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Logros",
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height:10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: logros
+              .map((logros)=> Chip(label: Text(logros))).toList()
+          )
         ],
       ),
     );

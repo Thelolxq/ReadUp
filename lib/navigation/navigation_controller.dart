@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:read_up/screens/homePages/historial_screen.dart';
 import 'package:read_up/screens/homePages/home_screen.dart';
 import 'package:read_up/screens/homePages/favorites_screen.dart';
 import 'package:read_up/screens/homePages/profile_screen.dart';
@@ -10,7 +11,7 @@ class NavigationController with ChangeNotifier{
   int get selectedIndex => _selectedIndex;
 
 
-  final screens = [HomeScreen(), FavoritesScreen(), ProfileScreen()];
+  final screens = [HomeScreen(), FavoritesScreen(), HistorialScreen() ,ProfileScreen()];
 
 
   void updateIndex(int index){

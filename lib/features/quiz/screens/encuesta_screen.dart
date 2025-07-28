@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:read_up/features/quiz/viewmodels/quiz_intro_viewmodel.dart';
 import 'package:read_up/features/quiz/screens/edad_encuesta_screen.dart';
+import 'package:read_up/features/quiz/viewmodels/quiz_intro_viewmodel.dart';
 import 'package:read_up/widgets/button_quiz.dart';
 
 
@@ -14,12 +14,19 @@ class EncuestaScreen extends StatefulWidget {
 
 class _EncuestaScreenState extends State<EncuestaScreen> {
   static const _primaryColor = Color.fromARGB(255, 27, 63, 154);
-  static const _animationDuration = Duration(milliseconds: 700);
+  static const _animationDuration = Duration(milliseconds: 300);
 
   @override
   void initState() {
     super.initState();
-    context.read<QuizIntroViewModel>().start();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final viewModel = context.read<QuizIntroViewModel>();
+        viewModel.reset(); 
+        
+        viewModel.start();
+      }
+    });
   }
 
   void _onScreenTap() {
@@ -64,7 +71,7 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
     );
   }
 
-  Widget _buildContent(QuizIntroState currentState) {
+   Widget _buildContent(QuizIntroState currentState) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -72,6 +79,7 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
         const SizedBox(height: 40),
         const Text(
           "Vamos a personalizar tu Experiencia",
+          textAlign: TextAlign.center,
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _primaryColor),
         ),
         const SizedBox(height: 16),
@@ -99,7 +107,7 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
 
     return AnimatedContainer(
       duration: _animationDuration,
-      curve: Curves.elasticOut,
+      curve: Curves.easeOut,
       width: isButtonVisible ? size.width : 0,
       height: isButtonVisible ? 60 : 0,
       child: Opacity(

@@ -238,7 +238,6 @@ class _BookReaderViewState extends State<BookReaderView> {
 }
 
  void _triggerQuiz(int currentPageIndex) async {
-    // Muestra un diálogo de carga para que el usuario sepa que algo está pasando
     showDialog(
       context: context,
       barrierDismissible: false,

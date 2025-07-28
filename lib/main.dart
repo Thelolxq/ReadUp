@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:read_up/features/auth/screens/sign_in_screen.dart';
 import 'package:read_up/features/quiz/viewmodels/gender_selection_viewmodel.dart';
@@ -21,7 +22,9 @@ import 'package:read_up/features/auth/screens/register_screen.dart';
 import 'package:read_up/features/quiz/screens/sexo_encuesta_screen.dart';
 import 'package:read_up/features/auth/screens/welcome_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es_ES');
   runApp(MainApp());
 }
 

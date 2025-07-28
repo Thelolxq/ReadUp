@@ -27,7 +27,7 @@ class ReviewServices {
         return resenasList.map((json) => Review.fromJson(json)).toList();
 
       }else{
-          throw Exception("Error en el servidor: Codigo de estado: ${response.statusCode}, Body: ${response.body}");
+          throw Exception("Error en el servidor: ${response.body}");
         
       }
   
@@ -59,7 +59,7 @@ class ReviewServices {
       if(response.statusCode == 201){
         final responseData = jsonDecode(response.body);
       }else{
-      throw Exception("Error en el servidor: Codigo de estado: ${response.statusCode}, Body: ${response.body}");
+      throw Exception("Error en el servidor: Body: ${response.body}");
 
       }
     }catch(error){

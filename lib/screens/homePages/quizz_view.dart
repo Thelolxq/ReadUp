@@ -129,7 +129,7 @@ class _QuizViewState extends State<QuizView> {
             TextButton(
               child: const Text('Aceptar'),
               onPressed: () {
-                Navigator.of(context).pop(); // Cierra solo el diálogo
+                Navigator.of(context).pop();
               },
             ),
           ],
